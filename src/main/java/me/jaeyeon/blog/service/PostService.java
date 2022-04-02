@@ -2,8 +2,8 @@ package me.jaeyeon.blog.service;
 
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.PostDto;
+import me.jaeyeon.blog.dto.PostResponse;
 import me.jaeyeon.blog.entity.Post;
-import me.jaeyeon.blog.entity.PostResponse;
 import me.jaeyeon.blog.exception.ResourceNotFoundException;
 import me.jaeyeon.blog.repository.PostRepository;
 import org.modelmapper.ModelMapper;

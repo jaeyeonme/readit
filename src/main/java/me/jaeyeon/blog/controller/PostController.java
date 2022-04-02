@@ -2,7 +2,7 @@ package me.jaeyeon.blog.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.PostDto;
-import me.jaeyeon.blog.entity.PostResponse;
+import me.jaeyeon.blog.dto.PostResponse;
 import me.jaeyeon.blog.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ public class PostController {
     public static final String DEFAULT_PAGE_SIZE = "10";
     public static final String DEFAULT_SORT_BY = "id";
     public static final String DEFAULT_SORT_DIRECTION = "asc";
-
     private final PostService postService;
 
     // CREATE
@@ -42,7 +40,7 @@ public class PostController {
 
     // READ (by id)
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<PostDto> getPostById(@PathVariable(value = "id") Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
@@ -50,7 +48,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto,
-                                              @PathVariable(name = "id") Long id) {
+                                              @PathVariable(value = "id") Long id) {
         final PostDto postResponse = postService.updatePost(postDto, id);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
@@ -58,7 +56,7 @@ public class PostController {
     // DELETE
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<String> deletePost(@PathVariable(value = "id") Long id) {
         postService.deletePostById(id);
         return new ResponseEntity<>("Post entity deleted successfully", HttpStatus.OK);
     }

@@ -1,9 +1,8 @@
-package me.jaeyeon.blog.entity;
+package me.jaeyeon.blog.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.jaeyeon.blog.dto.PostDto;
 
 import java.util.List;
 

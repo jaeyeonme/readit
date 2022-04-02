@@ -6,11 +6,12 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Getter @Setter
-@Table(name = "role")
+@Getter
+@Setter
+@Table(name = "roles")
 public class Role {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(length = 60)
