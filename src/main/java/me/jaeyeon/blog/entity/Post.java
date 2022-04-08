@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "title", nullable = false, unique = true)

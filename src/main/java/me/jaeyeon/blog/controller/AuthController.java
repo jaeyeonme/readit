@@ -1,12 +1,14 @@
 package me.jaeyeon.blog.controller;
 
 import lombok.RequiredArgsConstructor;
+import me.jaeyeon.blog.dto.JWTAuthResponse;
 import me.jaeyeon.blog.dto.LoginDto;
 import me.jaeyeon.blog.dto.SignUpDto;
 import me.jaeyeon.blog.entity.Role;
 import me.jaeyeon.blog.entity.User;
 import me.jaeyeon.blog.repository.RoleRepository;
 import me.jaeyeon.blog.repository.UserRepository;
+import me.jaeyeon.blog.security.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -30,14 +30,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User signed-in successfully!!", HttpStatus.OK);
+
+        // get token from tokenProvider
+        String token = tokenProvider.generateToken(authentication);
+        return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
     @PostMapping("/signup")
@@ -60,8 +64,9 @@ public class AuthController {
         user.setEmail(signUpDto.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
-        Role roles = roleRepository.findByName("ROLE_ADMIN").get();
-        user.setRoles(Collections.singleton(roles));
+//        Role roles = roleRepository.findByName("ROLE_ADMIN").get();
+        Role roles = roleRepository.findByName("ROLE_ADMIN").isPresent() ? roleRepository.findByName("ROLE_ADMIN").get() : null;
+
         userRepository.save(user);
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
     }
