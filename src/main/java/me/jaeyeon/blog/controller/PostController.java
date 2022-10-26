@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.PostDto;
 import me.jaeyeon.blog.dto.PostResponse;
 import me.jaeyeon.blog.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,48 +16,55 @@ import javax.validation.Valid;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    public static final String DEFAULT_PAGE_NUMBER = "0";
-    public static final String DEFAULT_PAGE_SIZE = "10";
-    public static final String DEFAULT_SORT_BY = "id";
-    public static final String DEFAULT_SORT_DIRECTION = "asc";
     private final PostService postService;
+    private final ModelMapper modelMapper;
+    static final String DEFAULT_PAGE_NUMBER = "0";
+    static final String DEFAULT_PAGE_SIZE = "10";
+    static final String DEFAULT_SORT_BY = "id";
+    static final String DEFAULT_SORT_DIRECTION = "ASC";
 
-    // CREATE
-    @PreAuthorize("hasRole('ADMIN')")
+    // http://localhost:8008/api/posts
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
-        return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
+    public ResponseEntity<PostDto> createPost(@RequestBody @Valid PostDto postDto) {
+        PostDto newPost = postService.createPost(postDto);
+        return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
 
-    // READ (ALL)
+
+    // http://localhost:8008/api/posts&pageNo=0&pageSize=5
+    // http://localhost:8080/api/posts?pageNo=2&pageSize=5&sortBy=title&sortDir=DESC
     @GetMapping
-    public PostResponse getAllPosts(@RequestParam(value = "pageNo", defaultValue = DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-                                    @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE, required = false) int pageSize,
-                                    @RequestParam(value = "sortBy", defaultValue = DEFAULT_SORT_BY, required = false) String sortBy,
-                                    @RequestParam(value = "sortDir", defaultValue = DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
+    public PostResponse getAllPosts(
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(defaultValue = DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+
         return postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
     }
 
-    // READ (by id)
+    // http://localhost:8080/api/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+    public ResponseEntity<PostDto> getPostById(@PathVariable("id") Long id) {
+        PostDto postById = postService.getPostById(id);
+        return new ResponseEntity<>(postById, HttpStatus.OK);
     }
 
-    // UPDATE
-    @PreAuthorize("hasRole('ADMIN')")
+    // http://localhost:8080/api/posts/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto,
-                                              @PathVariable(value = "id") Long id) {
-        final PostDto postResponse = postService.updatePost(postDto, id);
-        return new ResponseEntity<>(postResponse, HttpStatus.OK);
+    public ResponseEntity<PostDto> updatePost(@RequestBody @Valid PostDto postDto,
+                                              @PathVariable("id") Long id) {
+
+        PostDto updatedPost = postService.updatePost(postDto, id);
+        return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
-    // DELETE
-    @PreAuthorize("hasRole('ADMIN')")
+    // http://localhost:8080/api/posts/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<String> deletePost(@PathVariable("id") Long id) {
         postService.deletePostById(id);
-        return new ResponseEntity<>("Post entity deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
     }
 }

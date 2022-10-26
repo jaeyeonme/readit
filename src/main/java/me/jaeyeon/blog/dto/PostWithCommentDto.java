@@ -4,9 +4,10 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Data
-public class PostDto {
+public class PostWithCommentDto {
 
     private Long id;
 
@@ -20,5 +21,5 @@ public class PostDto {
 
     @NotBlank(message = "컨텐츠를 입력해 주세요.")
     private String content;
-
+    private Set<CommentDto> comments;
 }

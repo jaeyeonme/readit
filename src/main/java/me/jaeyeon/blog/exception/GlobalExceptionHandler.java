@@ -1,80 +1,68 @@
 package me.jaeyeon.blog.exception;
 
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 
-@ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-    // handle specific exception
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException exception,
-                                                                        WebRequest webRequest) {
-
-        final ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
-                webRequest.getDescription(false));
-
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    /**
+     * Javax.validation.Valid 또는 @Validated binding error가 발생할 경우
+     */
+    @ExceptionHandler(BindException.class)
+    protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
+        log.error("handleBindException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e.getBindingResult());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
     }
 
-    @ExceptionHandler(BlogApiException.class)
-    public ResponseEntity<ErrorDetails> handleBlogApiException(BlogApiException exception,
-                                                                        WebRequest webRequest) {
-
-        final ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
-                webRequest.getDescription(false));
-
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    /**
+     * 주로 @RequestParam enum으로 binding 못했을 경우 발생
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.error("handleMethodArgumentTypeMismatchException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
     }
 
-    // global exception
+    /**
+     * 지원하지 않은 HTTP method 호출 할 경우 발생
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        log.error("handleHttpRequestMethodNotSupportedException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED.toString(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
+    }
+
+    /**
+     * 비즈니스 로직 실행 중 오류 발생
+     */
+    @ExceptionHandler(value = { BlogApiException.class })
+    protected ResponseEntity<ErrorResponse> handleConflict(BlogApiException e) {
+        log.error("BusinessException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getErrorCode(), e.getMessage());
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(errorResponse);
+    }
+
+    /**
+     * 나머지 예외 발생
+     */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleGlobalException(Exception exception,
-                                                               WebRequest webRequest) {
-
-        final ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
-                webRequest.getDescription(false));
-
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+        log.error("Exception", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
-
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
-
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            final String fieldName = ((FieldError) error).getField();
-            final String message = error.getDefaultMessage();
-            errors.put(fieldName, message);
-        });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }
-
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception,
-//                                                                        WebRequest webRequest) {
-//
-//        Map<String, String> errors = new HashMap<>();
-//        exception.getBindingResult().getAllErrors().forEach((error) -> {
-//            final String fieldName = ((FieldError) error).getField();
-//            final String message = error.getDefaultMessage();
-//            errors.put(fieldName, message);
-//        });
-//
-//        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-//    }
 }

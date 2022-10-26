@@ -3,12 +3,14 @@ package me.jaeyeon.blog.service;
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.PostDto;
 import me.jaeyeon.blog.dto.PostResponse;
-import me.jaeyeon.blog.entity.Post;
-import me.jaeyeon.blog.exception.ResourceNotFoundException;
+import me.jaeyeon.blog.exception.BlogApiException;
+import me.jaeyeon.blog.exception.ErrorCode;
+import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.PostRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
@@ -26,82 +28,62 @@ public class PostService {
 
     @Transactional
     public PostDto createPost(PostDto postDto) {
-
-        // convert DTO to entity
-        Post post = mapToEntity(postDto);
-        final Post newPost = postRepository.save(post);
-
-        // convert entity to DTO
-        return mapToDTO(newPost);
+        Post post = modelMapper.map(postDto, Post.class);
+        return modelMapper.map(postRepository.save(post), PostDto.class);
     }
 
+    // 모든 Posts 가져오기 (Pagination)
     public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
 
-        final Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        // pageable 을 입력해 원하는 페이지의 사이즈만큼 리스트 리턴
+        Page<Post> posts = postRepository.findAll(pageable);
 
-        // create Pageable pageable
-        final PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
-        final Page<Post> posts = postRepository.findAll(pageable);
+        // 페이지객체 안의 리스트만 가져오기
+        List<Post> listOfPosts = posts.getContent();
+        // DTO로 변환하려 리턴
+        List<PostDto> content = listOfPosts.stream()
+                .map(post -> modelMapper.map(post, PostDto.class))
+                .collect(Collectors.toList());
 
-        // get content for page obj
-        final List<Post> listOfPosts = posts.getContent();
-
-        List<PostDto> content = listOfPosts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
-
-        final PostResponse postResponse = new PostResponse();
-        postResponse.setContent(content);
-        postResponse.setPageSize(posts.getSize());
-        postResponse.setTotalElements(posts.getTotalElements());
-        postResponse.setTotalPages(posts.getTotalPages());
-        postResponse.setLast(posts.isLast());
-
-        return postResponse;
+        return PostResponse.builder()
+                .content(content)
+                .pageNo(posts.getNumber())
+                .pageSize(posts.getSize())
+                .totalElements(posts.getTotalElements())
+                .totalPages(posts.getTotalPages())
+                .last(posts.isLast())
+                .build();
     }
-
 
     public PostDto getPostById(Long id) {
-        final Post post = getPost(id);
-        return mapToDTO(post);
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new BlogApiException(ErrorCode.POST_NOT_FOUND));
+        return modelMapper.map(post, PostDto.class);
     }
 
     @Transactional
     public PostDto updatePost(PostDto postDto, Long id) {
-        // get post by id from the database
-        final Post post = getPost(id);
+        Post post = getPost(id);
 
-        final Post updatedPost = postRepository.save(post);
-        return mapToDTO(updatedPost);
+        post.setTitle(postDto.getTitle());
+        post.setDescription(postDto.getDescription());
+        post.setContent(postDto.getContent());
+        return modelMapper.map(post, PostDto.class);
     }
 
     @Transactional
     public void deletePostById(Long id) {
-        final Post post = getPost(id);
+        Post post = getPost(id);
         postRepository.delete(post);
     }
 
     private Post getPost(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
-    }
-
-    // convert Entity to DTO
-    private PostDto mapToDTO(Post post) {
-
-//        PostDto postDto = new PostDto();
-//        postDto.setId(post.getId());
-//        postDto.setTitle(post.getTitle());
-//        postDto.setDescription(post.getDescription());
-//        postDto.setContent(post.getContent());
-        return modelMapper.map(post, PostDto.class);
-    }
-
-    // convert DTO to entity
-    private Post mapToEntity(PostDto postDto) {
-
-//        Post post = new Post();
-//        post.setTitle(postDto.getTitle());
-//        post.setDescription(postDto.getDescription());
-//        post.setContent(postDto.getContent());
-        return modelMapper.map(postDto, Post.class);
+        return postRepository.findById(id).orElseThrow(
+                () -> new BlogApiException(ErrorCode.POST_NOT_FOUND));
     }
 }

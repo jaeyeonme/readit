@@ -2,14 +2,13 @@ package me.jaeyeon.blog.service;
 
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.CommentDto;
-import me.jaeyeon.blog.entity.Comment;
-import me.jaeyeon.blog.entity.Post;
 import me.jaeyeon.blog.exception.BlogApiException;
-import me.jaeyeon.blog.exception.ResourceNotFoundException;
+import me.jaeyeon.blog.exception.ErrorCode;
+import me.jaeyeon.blog.model.Comment;
+import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.CommentRepository;
 import me.jaeyeon.blog.repository.PostRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,114 +16,93 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentService {
 
-    private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
 
     @Transactional
     public CommentDto createComment(Long postId, CommentDto commentDto) {
-
-        Comment comment = mapToEntity(commentDto);
-
         // retrieve post entity by id
-        final Post post = getPost(postId);
+        Post post = getPost(postId);
 
-        // set post to comment entity
+        // set Post to comment entity
+        Comment comment = modelMapper.map(commentDto, Comment.class);
         comment.setPost(post);
 
         // comment entity to DB
-        final Comment newComment = commentRepository.save(comment);
-
-        return mapToDTO(newComment);
+        Comment newComment = commentRepository.save(comment);
+        return modelMapper.map(newComment, CommentDto.class);
     }
 
+    // postId로 댓글 찾기
     public List<CommentDto> getCommentsByPostId(Long postId) {
-        // retrieve comments by postId
-        final List<Comment> comments = commentRepository.findByPostId(postId);
-
-        // convert list of comment entities to list of comment dto's
-        return comments.stream().map(comment -> mapToDTO(comment)).collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        return comments.stream()
+                .map(comment -> modelMapper.map(comment, CommentDto.class))
+                .collect(Collectors.toList());
     }
 
+    // id로 댓글 찾기
     public CommentDto getCommentById(Long postId, Long commentId) {
-        // retrieve post entity by id
-        final Post post = getPost(postId);
+        //ID 로 포스트 찾기 못찾을 경우 예외처리
+        Post post = getPost(postId);
+        //ID 로 댓글 찾기 못찾을 경우 예외
+        Comment comment = getComment(commentId);
 
-        // retrieve comment by id
-        final Comment comment = getComment(commentId);
+        if (!comment.getPost().getId().equals(post.getId())) {
+            throw new BlogApiException(ErrorCode.COMMENT_NOT_EQUALS_POST);
+        }
 
-        extracted(comment, post, "Comment does not belong to post");
-
-        return mapToDTO(comment);
+        // mapToDTO
+        return modelMapper.map(comment, CommentDto.class);
     }
 
+    // id로 댓글 업데이트
+
     @Transactional
-    public CommentDto updateComment(Long postId, Long commentId, CommentDto commentRequest) {
-        // retrieve post entity by id
-        final Post post = getPost(postId);
+    public CommentDto updateCommentById(Long postId, Long commentId, CommentDto commentDto) {
+        //ID 로 포스트 찾기 못찾을 경우 예외처리
+        Post post = getPost(postId);
+        //ID 로 댓글 찾기 못찾을 경우 예외
+        Comment comment = getComment(commentId);
 
-        final Comment comment = getComment(commentId);
+        if (!comment.getPost().getId().equals(post.getId())) {
+            throw new BlogApiException(ErrorCode.COMMENT_NOT_EQUALS_POST);
+        }
 
-        extracted(comment, post, "Comment does not belongs to post");
+        comment.setName(commentDto.getName());
+        comment.setEmail(commentDto.getEmail());
+        comment.setBody(commentDto.getBody());
 
-        comment.setName(commentRequest.getName());
-        comment.setEmail(commentRequest.getEmail());
-        comment.setBody(commentRequest.getBody());
-
-        final Comment updatedComment = commentRepository.save(comment);
-        return mapToDTO(updatedComment);
+        return modelMapper.map(commentRepository.save(comment), CommentDto.class);
     }
 
+    // id로 댓글 삭제
     @Transactional
-    public void deleteComment(Long postId, Long commentId) {
+    public void deleteCommentById(Long postId, Long commentId) {
+        //ID 로 포스트 찾기 못찾을 경우 예외처리
+        Post post = getPost(postId);
+        //ID 로 댓글 찾기 못찾을 경우 예외
+        Comment comment = getComment(commentId);
 
-        // retrieve post entity by id
-        final Post post = getPost(postId);
-
-        // retrieve comment by id
-        final Comment comment = getComment(commentId);
-
-        extracted(comment, post, "Comment does not belongs to post");
+        if (!comment.getPost().getId().equals(post.getId())) {
+            throw new BlogApiException(ErrorCode.COMMENT_NOT_EQUALS_POST);
+        }
 
         commentRepository.delete(comment);
     }
 
-    private void extracted(Comment comment, Post post, String message) {
-        if (!comment.getPost().getId().equals(post.getId())) {
-            throw new BlogApiException(HttpStatus.BAD_REQUEST, message);
-        }
+    private Post getPost(Long postId) {
+        return postRepository.findById(postId).orElseThrow(
+                () -> new BlogApiException(ErrorCode.POST_NOT_FOUND));
     }
 
     private Comment getComment(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(
-                () -> new ResourceNotFoundException("Comment", "id", commentId));
-    }
-
-    private Post getPost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(
-                () -> new ResourceNotFoundException("Post", "id", postId));
-    }
-
-
-    private CommentDto mapToDTO(Comment comment) {
-//        final CommentDto commentDto = new CommentDto();
-//        commentDto.setId(comment.getId());
-//        commentDto.setName(comment.getName());
-//        commentDto.setEmail(comment.getEmail());
-//        commentDto.setBody(comment.getBody());
-        return modelMapper.map(comment, CommentDto.class);
-    }
-
-    private Comment mapToEntity(CommentDto commentDto) {
-//        final Comment comment = new Comment();
-//        comment.setId(commentDto.getId());
-//        comment.setName(commentDto.getName());
-//        comment.setEmail(commentDto.getEmail());
-//        comment.setBody(commentDto.getBody());
-        return modelMapper.map(commentDto, Comment.class);
+                () -> new BlogApiException(ErrorCode.COMMENT_NOT_FOUND));
     }
 }
