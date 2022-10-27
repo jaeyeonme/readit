@@ -27,7 +27,7 @@
 <br>
 
 # :pushpin: 실행 영상 (Swagger)
-> http://54.225.27.126/swagger-ui/index.html#/
+> http://54.225.27.126:8080/swagger-ui/index.html#/
 
   - Swagger로 명세서 문서화 작업
 
