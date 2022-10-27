@@ -78,4 +78,7 @@ private Set<Comment> comments = new HashSet<>();
 private Post post;
 ```
 
+<br>
 
+## 6. 앞으로 추가해야될 작업
+ - JWT
