@@ -57,10 +57,13 @@
 ## 3. ERD 설계
 <img src="https://github.com/jaeyeonme/spring-blog/blob/main/picture/erd.png?raw=true" width="600" height="600">
 
+<br>
 
 ## 4. DTO
   - Request, Resonse DTO를 따로 생성하지 않고 -> modelmapper로 통합
   - open-session-in-view true가 기본값이므로 Service 레이어에서 Entity -> DTO 변환작업
+
+<br>
   
 ## 5. 핵심 기능
   - 게시글과 댓글 연관관계를 고민하다, 고아객체 와 영속성전이로 설정해서 게시글이 지워지면 댓글도 같이 지워지게 설정
