@@ -67,8 +67,6 @@
   
 ## 5. 핵심 기능
   - 게시글과 댓글 연관관계를 고민하다, 고아객체 와 영속성전이로 설정해서 게시글이 지워지면 댓글도 같이 지워지게 설정
- 
-<br> 
 
 ```java
 @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
