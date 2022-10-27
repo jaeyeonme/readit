@@ -26,9 +26,10 @@
 <br>
 <br>
 
-# :pushpin: Blog Project
-- 실행 영상 (Swagger)
+# :pushpin: 실행 영상 (Swagger)
 > http://54.225.27.126/swagger-ui/index.html#/
+
+  - Swagger로 명세서 문서화 작업
 
 </br>
 
