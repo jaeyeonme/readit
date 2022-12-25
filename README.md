@@ -26,10 +26,9 @@
 <br>
 <br>
 
-# :pushpin: 실행 영상 (Swagger)
-> http://54.225.27.126:8080/swagger-ui/index.html#/
-
-  - Swagger로 명세서 문서화 작업
+# :pushpin: 배포(수정중)
+> 
+- AWS EC2 기간이 끝나서 Heroku로 이동중입니다.
 
 </br>
 
@@ -45,12 +44,12 @@
   - Spring Boot 2.5.9
   - Gradle
   - Spring Data JPA
-  - H2
+  - MySQL
   - Swagger
-  - Post Man
 
-#### `AWS`
-  - EC2
+
+#### `Heroku`
+  - MySQL
 
 </br>
 
@@ -81,5 +80,5 @@ private Post post;
 
 <br>
 
-## 6. 앞으로 추가해야될 작업
+## 6. 추가작업 중
  - JWT
