@@ -65,7 +65,7 @@
 <br>
   
 ## 5. 연관관계 처리
-  - 게시글과 댓글 연관관계를 고민하다, 고아객체 와 영속성전이로 설정해서 게시글이 지워지면 댓글도 같이 지워지게 설정
+  - 게시글과 댓글 1:N 연관관계 처리를 하였습니다., 고아객체 와 영속성전이(CASCADE)와 고아 객체(PrphanRemoval)로 세팅해서 부모엔티티가 변경되면 자식 엔티티도 같이 변경될 수 있도록 설정하였습니다.
 
 ```java
 @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
