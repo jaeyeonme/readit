@@ -59,8 +59,8 @@
 <br>
 
 ## 4. DTO
-  - Request, Resonse DTO를 따로 생성하지 않고 -> modelmapper로 통합
-  - open-session-in-view true가 기본값이므로 Service 레이어에서 Entity -> DTO 변환작업
+  - Request, Resonse DTO를 따로 생성하지 않고 -> modelmapper로 DTO 통합 
+  - open-session-in-view true가 default 값이므로, Service Layer에서 (Entity -> DTO 변환)
 
 <br>
   
