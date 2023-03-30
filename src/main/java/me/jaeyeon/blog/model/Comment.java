@@ -1,43 +1,24 @@
 package me.jaeyeon.blog.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
 
 @Entity
-@Getter
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseTimeEntity {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String name;
+    private String email;
+    private String body;
 
+    // 여러개(댓글)에 하나의 포스트, 포스트 클래스 : OneToMany 하나의 포스트에 여러개 댓글
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
     private Post post;
-
-    private String content;
-
-
-    public void setPost(Post post) {
-        if (this.post != null) {
-            this.post.getComments().remove(this);
-        }
-
-        this.post = post;
-        post.getComments().add(this);
-    }
 }
