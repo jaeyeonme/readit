@@ -1,4 +1,4 @@
-package me.jaeyeon.blog.model;
+package me.jaeyeon.blog.config;
 
 import java.time.LocalDateTime;
 
