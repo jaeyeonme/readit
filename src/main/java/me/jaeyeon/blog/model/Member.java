@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,11 @@ public class Member extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "member")
 	private List<Post> posts = new ArrayList<>();
+
+	@Builder
+	public Member(String userName, String email, String password) {
+		this.userName = userName;
+		this.email = email;
+		this.password = password;
+	}
 }

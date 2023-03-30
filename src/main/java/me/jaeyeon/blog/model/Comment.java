@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +32,12 @@ public class Comment extends BaseTimeEntity {
 
     private String content;
 
+    @Builder
+    public Comment(Member member, Post post, String content) {
+        this.member = member;
+        this.post = post;
+        this.content = content;
+    }
 
     public void setPost(Post post) {
         if (this.post != null) {

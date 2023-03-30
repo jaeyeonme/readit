@@ -42,6 +42,13 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    public Post(String title, String description, String content, Member author) {
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        setAuthor(author);
+    }
+
     public void setAuthor(Member member) {
         if (this.author != null) {
             this.author.getPosts().remove(this);
