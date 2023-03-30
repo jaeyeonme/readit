@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseTimeEntity {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     @Builder
-    public Comment(Member member, Post post, String content) {
+    private Comment(Member member, Post post, String content) {
         this.member = member;
         this.post = post;
         this.content = content;
