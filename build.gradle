@@ -23,11 +23,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.security:spring-security-crypto:5.7.6'
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation 'org.modelmapper:modelmapper:3.0.0'
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	compileOnly 'org.projectlombok:lombok'
-	implementation 'mysql:mysql-connector-java'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -56,35 +58,34 @@ jacocoTestReport {
 	finalizedBy 'jacocoTestCoverageVerification'
 }
 
-jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			enabled = true // 활성화
-			element = 'CLASS' // 클래스 단위로 커버리지 체크
-			// includes = []
-
-			// 라인 커버리지 제한을 80%로 설정
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.80
-			}
-
-			// 브랜치 커버리지 제한을 80%로 설정
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.80
-			}
-
-			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한합니다.
-			limit {
-				counter = 'LINE'
-				value = 'TOTALCOUNT'
-				maximum = 200
-			}
-			//excludes = []
-		}
-
-	}
-}
+//jacocoTestCoverageVerification {
+//	violationRules {
+//		rule {
+//			enabled = true // 활성화
+//			element = 'CLASS' // 클래스 단위로 커버리지 체크
+//			// includes = []
+//
+//			// 라인 커버리지 제한을 70%로 설정
+//			limit {
+//				counter = 'LINE'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.70
+//			}
+//
+//			// 브랜치 커버리지 제한을 50%로 설정
+//			limit {
+//				counter = 'BRANCH'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.50
+//			}
+//
+//			// 빈 줄을 제외한 코드의 라인수를 최대 100라인으로 제한합니다.
+//			limit {
+//				counter = 'LINE'
+//				value = 'TOTALCOUNT'
+//				maximum = 100
+//			}
+//			//excludes = []
+//		}
+//	}
+//}

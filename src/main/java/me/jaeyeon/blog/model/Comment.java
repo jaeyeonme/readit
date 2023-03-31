@@ -1,5 +1,6 @@
 package me.jaeyeon.blog.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,7 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column(name = "content", nullable = false)
     private String content;
 
     @Builder
