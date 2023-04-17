@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "M-001", "이미 사용중인 이메일입니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P-001", "Post not founded"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "C-001", "Comment not founded"),
     COMMENT_NOT_EQUALS_POST(HttpStatus.BAD_REQUEST, "C-002", "This is not a comment on the post."),

@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
+import me.jaeyeon.blog.exception.EmailAlreadyExistsException;
+import me.jaeyeon.blog.exception.ErrorCode;
 import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.repository.MemberRepository;
 
@@ -56,8 +58,8 @@ class MemberServiceTest {
 
 	@Test
 	@DisplayName("회원 가입 테스트 - 실패 (이메일 중복)")
-	void registerMemberTest_Fail() throws Exception {
-	    // given
+	void registerMemberTest_Fail_DuplicateEmail() throws Exception {
+		// given
 		MemberRegistrationReq request = new MemberRegistrationReq();
 		request.setUserName("test");
 		request.setEmail("test@email.com");
@@ -65,13 +67,13 @@ class MemberServiceTest {
 
 		when(memberRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
-	    // when
+		// when
 		Throwable throwable = catchThrowable(() -> memberService.register(request));
 
 		// then
 		verify(memberRepository, times(1)).existsByEmail(request.getEmail());
 		assertThat(throwable)
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessage("이미 사용중인 이메일 주소입니다.");
+			.isInstanceOf(EmailAlreadyExistsException.class)
+			.hasMessage(ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
 	}
 }

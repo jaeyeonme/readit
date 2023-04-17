@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
+import me.jaeyeon.blog.exception.EmailAlreadyExistsException;
+import me.jaeyeon.blog.exception.ErrorCode;
 import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.repository.MemberRepository;
 
@@ -25,7 +27,7 @@ public class MemberService {
 
 	private void validateDuplicate(String email) {
 		if (memberRepository.existsByEmail(email)) {
-			throw new IllegalStateException("이미 사용중인 이메일 주소입니다.");
+			throw new EmailAlreadyExistsException(ErrorCode.EMAIL_ALREADY_EXISTS);
 		}
 	}
 }

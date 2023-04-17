@@ -21,9 +21,8 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/register")
-	public ResponseEntity<MemberRegistrationRes> register(@RequestBody @Valid MemberRegistrationReq request) {
-		Member savedMember = memberService.register(request);
-		MemberRegistrationRes response = new MemberRegistrationRes(savedMember);
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	public ResponseEntity<Void> register(@RequestBody @Valid MemberRegistrationReq request) {
+		memberService.register(request);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
