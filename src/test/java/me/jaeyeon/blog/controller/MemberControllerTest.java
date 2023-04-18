@@ -70,7 +70,7 @@ class MemberControllerTest {
 		given(memberService.register(request)).willReturn(null);
 
 		// when
-		mockMvc.perform(post("/register")
+		mockMvc.perform(post("/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
@@ -92,7 +92,7 @@ class MemberControllerTest {
 		given(memberService.register(request)).willThrow(new EmailAlreadyExistsException(ErrorCode.EMAIL_ALREADY_EXISTS));
 
 		// when
-		mockMvc.perform(post("/register")
+		mockMvc.perform(post("/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
@@ -109,7 +109,7 @@ class MemberControllerTest {
 		given(memberService.signIn(signIn)).willReturn(member);
 
 		// when
-		mockMvc.perform(post("/sign-in")
+		mockMvc.perform(post("/members/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signIn)))
 			.andDo(print())
@@ -124,7 +124,7 @@ class MemberControllerTest {
 		given(memberService.signIn(signIn)).willThrow(new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
 
 		// when
-		mockMvc.perform(post("/sign-in")
+		mockMvc.perform(post("/members/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signIn)))
 			.andDo(print())
