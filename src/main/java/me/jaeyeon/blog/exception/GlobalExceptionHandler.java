@@ -1,5 +1,6 @@
 package me.jaeyeon.blog.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -53,8 +54,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleConflict(BlogApiException e) {
         log.error("BusinessException", e);
         ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getErrorCode(), e.getMessage());
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(errorResponse);
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
     }
 
     /**
@@ -65,5 +65,15 @@ public class GlobalExceptionHandler {
         log.error("Exception", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    /**
+     * 데이터 무결성 제약 조건이 위반되는 경우 예외 발생
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<ErrorResponse> dataIntegrityViolationException(Exception e) {
+        log.error("DataIntegrityViolationException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
