@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.exception.ErrorCode;
 
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
@@ -14,11 +15,18 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
 		Object handler) throws Exception {
 
-		String requestURI = request.getRequestURI();
 		HttpSession session = request.getSession();
 
 		if (session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
-			response.sendRedirect("/members/signin?redirectURL=" + requestURI);
+			ErrorCode errorCode = ErrorCode.UNAUTHORIZED_MEMBER;
+			response.setStatus(errorCode.getHttpStatus().value());
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			response.getWriter().write(
+				"{\"errorCode\":\"" + errorCode.getErrorCode() +
+					"\", \"errorMessage\":\"" + errorCode.getMessage() + "\"}"
+			);
 			return false;
 		}
 
