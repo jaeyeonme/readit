@@ -32,9 +32,6 @@ public class Post extends BaseTimeEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
-    private String description;
-
     @Column(name = "content", nullable = false)
     private String content;
 
@@ -46,19 +43,18 @@ public class Post extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Post(String title, String description, String content, Member author) {
+    private Post(String title, String content, Member author) {
         this.title = title;
-        this.description = description;
         this.content = content;
-        setAuthor(author);
+        this.author = author;
     }
 
-    public void setAuthor(Member member) {
-        if (this.author != null) {
-            this.author.getPosts().remove(this);
-        }
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
-        this.author = member;
-        member.getPosts().add(this);
+    public boolean isAuthor(Long memberId) {
+        return this.author.getId().equals(memberId);
     }
 }

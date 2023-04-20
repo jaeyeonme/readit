@@ -8,7 +8,6 @@ import me.jaeyeon.blog.model.Comment;
 import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.CommentRepository;
 import me.jaeyeon.blog.repository.PostRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

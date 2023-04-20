@@ -1,74 +1,67 @@
 package me.jaeyeon.blog.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.dto.PostDto;
-import me.jaeyeon.blog.dto.PostResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 import javax.validation.Valid;
 
-// @Api(value = "CRUD Rest APIs for Post")
-// @RestController
-// @RequiredArgsConstructor
-// @RequestMapping("/api/posts")
-// public class PostController {
-//
-//     private final PostService postService;
-//     static final String DEFAULT_PAGE_NUMBER = "0";
-//     static final String DEFAULT_PAGE_SIZE = "10";
-//     static final String DEFAULT_SORT_BY = "id";
-//     static final String DEFAULT_SORT_DIRECTION = "ASC";
-//
-//     // http://localhost:8080/api/posts
-//     @ApiOperation(value = "Create Post REST API")
-//     @PostMapping
-//     public ResponseEntity<PostDto> createPost(@RequestBody @Valid PostDto postDto) {
-//         PostDto newPost = postService.createPost(postDto);
-//         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
-//     }
-//
-//
-//     // http://localhost:8080/api/posts&pageNo=0&pageSize=5
-//     // http://localhost:8080/api/posts?pageNo=2&pageSize=5&sortBy=title&sortDir=DESC
-//     @ApiOperation(value = "Get All Posts REST API")
-//     @GetMapping
-//     public PostResponse getAllPosts(
-//             @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-//             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, required = false) int pageSize,
-//             @RequestParam(defaultValue = DEFAULT_SORT_BY, required = false) String sortBy,
-//             @RequestParam(defaultValue = DEFAULT_SORT_DIRECTION, required = false) String sortDir
-//     ) {
-//
-//         return postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
-//     }
-//
-//     // http://localhost:8080/api/{id}
-//     @ApiOperation(value = "Get Post By ID REST API")
-//     @GetMapping("/{id}")
-//     public ResponseEntity<PostDto> getPostById(@PathVariable("id") Long id) {
-//         PostDto postById = postService.getPostById(id);
-//         return new ResponseEntity<>(postById, HttpStatus.OK);
-//     }
-//
-//     // http://localhost:8080/api/posts/{id}
-//     @ApiOperation(value = "Delete Post By Id REST API")
-//     @PutMapping("/{id}")
-//     public ResponseEntity<PostDto> updatePost(@RequestBody @Valid PostDto postDto,
-//                                               @PathVariable("id") Long id) {
-//
-//         PostDto updatedPost = postService.updatePost(postDto, id);
-//         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
-//     }
-//
-//     // http://localhost:8080/api/posts/{id}
-//     @DeleteMapping("/{id}")
-//     public ResponseEntity<String> deletePost(@PathVariable("id") Long id) {
-//         postService.deletePostById(id);
-//         return new ResponseEntity<>("Success", HttpStatus.OK);
-//
-//     }
-// }
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import lombok.RequiredArgsConstructor;
+import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.dto.PostReq;
+import me.jaeyeon.blog.dto.PostResponse;
+import me.jaeyeon.blog.service.PostService;
+
+@RestController
+@RequestMapping("/api/posts")
+@RequiredArgsConstructor
+public class PostController {
+
+    private final PostService postService;
+
+    @PostMapping
+    public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq,
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.createPost(postReq, memberId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
+        List<PostResponse> postResponses = postService.getAllPosts();
+        return new ResponseEntity<>(postResponses, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponse> getPostById(@PathVariable("id") Long id) {
+        PostResponse postResponse = postService.getPostById(id);
+        return new ResponseEntity<>(postResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
+                                            @PathVariable("id") Long id,
+                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.checkAuthor(memberId, id);
+        postService.updatePost(postReq, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
+                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.checkAuthor(memberId, id);
+        postService.deletePostById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+}

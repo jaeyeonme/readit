@@ -1,22 +1,26 @@
 package me.jaeyeon.blog.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import me.jaeyeon.blog.model.Post;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class PostResponse {
 
-    private List<PostDto> content;  //포스트 리스트
-    private int pageNo;             //페이지넘버
-    private int pageSize;		 	//페이지당 포스트 수
-    private long totalElements; 	//총 포스트 수
-    private int totalPages;			//총 페이지 수
-    private boolean last;			//마지막 페이지면 true
+    private Long id;
+    private String title;
+    private String content;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
+
+    public PostResponse(Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.createdDate = post.getCreatedDate();
+        this.modifiedDate = post.getModifiedDate();
+    }
 }
