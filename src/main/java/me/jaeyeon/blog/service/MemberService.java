@@ -44,6 +44,12 @@ public class MemberService {
 		return member;
 	}
 
+	@Transactional(readOnly = false)
+	public Member getMember(Long memberId) {
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+	}
+
 	private void checkPassword(String password, Member member) {
 		if (!passwordEncoder.matches(password, member.getPassword())) {
 			log.warn("Failed to login. Email: {}, Reason: wrong password", member.getEmail());
