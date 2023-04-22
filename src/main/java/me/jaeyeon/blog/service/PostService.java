@@ -46,14 +46,20 @@ public class PostService {
         return new PostResponse(post);
     }
 
-    public void updatePost(PostReq postReq, Long id) {
+    public void updatePost(PostReq postReq, Long id, Long memberId) {
         Post post = getPost(id);
+        checkWhetherAuthor(memberId, post);
         post.update(postReq.getTitle(), postReq.getContent());
     }
 
-    public void deletePostById(Long id) {
+    public void deletePostById(Long id, Long memberId) {
         Post post = getPost(id);
+        checkWhetherAuthor(memberId, post);
         postRepository.delete(post);
+    }
+
+    public Post findPostById(Long postId) {
+        return getPost(postId);
     }
 
     private Post getPost(Long id) {
@@ -61,8 +67,7 @@ public class PostService {
             () -> new BlogApiException(ErrorCode.POST_NOT_FOUND));
     }
 
-    public void checkAuthor(Long memberId, Long postId) {
-        Post post = getPost(postId);
+    public void checkWhetherAuthor(Long memberId, Post post) {
         if (!post.isAuthor(memberId)) {
             throw new BlogApiException(ErrorCode.IS_NOT_OWNER);
         }

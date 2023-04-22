@@ -49,6 +49,7 @@ class PostServiceTest {
 		testPost = Post.builder()
 			.title("Test Title")
 			.content("Test Content")
+			.author(testMember)
 			.build();
 	}
 
@@ -117,7 +118,7 @@ class PostServiceTest {
 		assertEquals(testPost.getModifiedDate(), result.getModifiedDate());
 		verify(postRepository, times(1)).findById(anyLong());
 	}
-	
+
 	@Test
 	@DisplayName("게시물 수정 - 정상적인 요청으로 게시물을 수정할 때")
 	void updatePost() throws Exception {
@@ -126,14 +127,14 @@ class PostServiceTest {
 		when(postRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
 		// when
-		postService.updatePost(updateRequest, 1L);
+		postService.updatePost(updateRequest, 1L, testMember.getId());
 
 		// then
 		verify(postRepository, times(1)).findById(anyLong());
 		assertEquals("Updated Title", testPost.getTitle());
 		assertEquals("Updated Content", testPost.getContent());
 	}
-	
+
 	@Test
 	@DisplayName("게시물 삭제 - 정상적인 요청으로 게시물을 삭제할 때")
 	void deletePostById() throws Exception {
@@ -141,7 +142,7 @@ class PostServiceTest {
 		when(postRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
 		// when
-		postService.deletePostById(1L);
+		postService.deletePostById(1L, testMember.getId());
 
 		// then
 		verify(postRepository, times(1)).findById(anyLong());
@@ -150,7 +151,7 @@ class PostServiceTest {
 
 	@Test
 	@DisplayName("게시물 작성자 확인 - 정상적인 요청으로 작성자와 세션 사용자가 동일한지 확인할 때")
-	void checkAuthor() throws Exception {
+	void checkWhetherAuthor() throws Exception {
 		// given
 		Post post = Post.builder()
 			.title(testPost.getTitle())
@@ -158,15 +159,14 @@ class PostServiceTest {
 			.author(testMember)
 			.build();
 
-		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-
 		// when
 		// memberId 1L is the same as the author's ID
-		assertDoesNotThrow(() -> postService.checkAuthor(testMember.getId(), 1L));
+		assertDoesNotThrow(() -> postService.checkWhetherAuthor(testMember.getId(), post));
 		// memberId 2L is not the same as the author's ID
-		assertThrows(BlogApiException.class, () -> postService.checkAuthor(2L, 1L));
+		assertThrows(BlogApiException.class, () -> postService.checkWhetherAuthor(2L, post));
 
 		// then
-		verify(postRepository, times(2)).findById(anyLong());
+		// postRepository.findById()가 호출되지 않는 것을 검증합니다.
+		verify(postRepository, times(0)).findById(anyLong());
 	}
 }

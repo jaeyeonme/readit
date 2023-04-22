@@ -97,7 +97,7 @@ class PostControllerTest {
 	}
 
 	@Test
-	@DisplayName("게시물 조회 테스트 - 성공 (딴일 게시글)")
+	@DisplayName("게시물 조회 테스트 - 성공 (단일 게시글)")
 	void getPostByIdTest_Success() throws Exception {
 	    // given
 		Member author = TestHelper.createTestMember(1L, "Test User", "test@example.com", "password");
@@ -132,23 +132,20 @@ class PostControllerTest {
 			.andExpect(status().isOk());
 
 		// then
-		verify(postService, times(1)).checkAuthor(memberID, postID);
-		verify(postService, times(1)).updatePost(postReq, postID);
-
+		verify(postService, times(1)).updatePost(postReq, postID, memberID);
 	}
 
 	@Test
 	@DisplayName("게시물 삭제 테스트 - 성공")
 	void deletePostTest_Success() throws Exception {
-	    // when
+		// when
 		mockMvc.perform(delete("/api/posts/{id}", postID)
 				.session(mockSession))
 			.andDo(print())
 			.andExpect(status().isOk());
 
-	    // then
-		verify(postService, times(1)).checkAuthor(memberID, postID);
-		verify(postService, times(1)).deletePostById(postID);
+		// then
+		verify(postService, times(1)).deletePostById(postID, memberID);
 	}
 
 	static class TestHelper {

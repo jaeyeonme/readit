@@ -50,18 +50,16 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
-                                            @PathVariable("id") Long id,
-                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.checkAuthor(memberId, id);
-        postService.updatePost(postReq, id);
+        @PathVariable("id") Long id,
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.updatePost(postReq, id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
-                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.checkAuthor(memberId, id);
-        postService.deletePostById(id);
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.deletePostById(id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
