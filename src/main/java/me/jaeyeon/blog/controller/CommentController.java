@@ -1,16 +1,5 @@
 package me.jaeyeon.blog.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.dto.CommentDto;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-
 // @Api(value = "CRUD REST API for Comment")
 // @RestController
 // @RequiredArgsConstructor

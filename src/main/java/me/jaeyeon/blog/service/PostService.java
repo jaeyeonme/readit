@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
 import me.jaeyeon.blog.exception.BlogApiException;
@@ -16,6 +17,7 @@ import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.MemberRepository;
 import me.jaeyeon.blog.repository.PostRepository;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -25,10 +27,12 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     public void createPost(PostReq postReq, Long memberId) {
+        log.info("Creating post with memberId: {}", memberId);
         Member author = memberRepository.findById(memberId)
             .orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
         Post post = postReq.toEntity(author);
         postRepository.save(post);
+        log.info("Post created with id: {}", post.getId());
     }
 
     @Transactional(readOnly = true)
@@ -47,15 +51,19 @@ public class PostService {
     }
 
     public void updatePost(PostReq postReq, Long id, Long memberId) {
+        log.info("Updating post with id: {}", id);
         Post post = getPost(id);
         checkWhetherAuthor(memberId, post);
         post.update(postReq.getTitle(), postReq.getContent());
+        log.info("Post updated with id: {}", id);
     }
 
     public void deletePostById(Long id, Long memberId) {
+        log.info("Deleting post with id: {}", id);
         Post post = getPost(id);
         checkWhetherAuthor(memberId, post);
         postRepository.delete(post);
+        log.info("Post deleted with id: {}", id);
     }
 
     public Post findPostById(Long postId) {
