@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.jaeyeon.blog.dto.CommentReq;
 import me.jaeyeon.blog.dto.CommentRes;
 import me.jaeyeon.blog.exception.BlogApiException;
@@ -15,6 +16,7 @@ import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.CommentRepository;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,28 +36,39 @@ public class CommentService {
         // CommentReq에서 Comment 엔티티 생성
         Comment comment = commentReq.toEntity(member, post);
 
+        // 댓글을 게시글에 추가
+        comment.setPost(post);
+
         // Comment 저장 및 ID 반환
         Comment savedComment = commentRepository.save(comment);
+        log.info("Created comment with ID: {}", savedComment.getId());
         return savedComment.getId();
     }
 
     @Transactional(readOnly = true)
     public Page<CommentRes> getCommentsByPostId(Long postId, Pageable pageable) {
-        Page<Comment> comments = commentRepository.findAllByPost_Id(postId, pageable);
-        return comments.map(CommentRes::new);
+        return commentRepository.findAllByPost_Id(postId, pageable).map(CommentRes::new);
     }
 
-    // public void updateComment(Long id, CommentReq commentReq, Long memberId) {
-    //     Comment comment = getComment(id);
-    //     postService.checkAuthor(memberId, comment.getPost().getId());
-    //     comment.updateComment(commentReq.getContent());
-    // }
-    //
-    // public void deleteComment(Long id, Long memberId) {
-    //     Comment comment = getComment(id);
-    //     postService.checkAuthor(memberId, comment.getPost().getId());
-    //     commentRepository.delete(comment);
-    // }
+    @Transactional(readOnly = true)
+    public CommentRes getCommentById(Long commentId) {
+        Comment comment = getComment(commentId);
+        return new CommentRes(comment);
+    }
+
+    public void updateComment(Long id, CommentReq commentReq, Long memberId) {
+        Comment comment = getComment(id);
+        checkWhetherAuthor(comment, memberId);
+        comment.updateComment(commentReq.getContent());
+        log.info("Updated comment with ID: {}", comment.getId());
+    }
+
+    public void deleteComment(Long id, Long memberId) {
+        Comment comment = getComment(id);
+        checkWhetherAuthor(comment, memberId);
+        commentRepository.delete(comment);
+        log.info("Deleted comment with ID: {}", comment.getId());
+    }
 
     private Comment getComment(Long id) {
         return commentRepository.findById(id)
