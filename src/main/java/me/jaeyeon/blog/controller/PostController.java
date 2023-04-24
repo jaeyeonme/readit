@@ -1,9 +1,11 @@
 package me.jaeyeon.blog.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,8 +39,9 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
-        List<PostResponse> postResponses = postService.getAllPosts();
+    public ResponseEntity<Page<PostResponse>> getAllPosts(
+        @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostResponse> postResponses = postService.getAllPosts(pageable);
         return new ResponseEntity<>(postResponses, HttpStatus.OK);
     }
 

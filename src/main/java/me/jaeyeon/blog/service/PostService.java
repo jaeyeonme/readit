@@ -1,8 +1,7 @@
 package me.jaeyeon.blog.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,6 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     public void createPost(PostReq postReq, Long memberId) {
-        log.info("Creating post with memberId: {}", memberId);
         Member author = memberRepository.findById(memberId)
             .orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
         Post post = postReq.toEntity(author);
@@ -36,11 +34,8 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        return posts.stream()
-            .map(PostResponse::new)
-            .collect(Collectors.toList());
+    public Page<PostResponse> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable).map(PostResponse::new);
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +46,6 @@ public class PostService {
     }
 
     public void updatePost(PostReq postReq, Long id, Long memberId) {
-        log.info("Updating post with id: {}", id);
         Post post = getPost(id);
         checkWhetherAuthor(memberId, post);
         post.update(postReq.getTitle(), postReq.getContent());
@@ -59,7 +53,6 @@ public class PostService {
     }
 
     public void deletePostById(Long id, Long memberId) {
-        log.info("Deleting post with id: {}", id);
         Post post = getPost(id);
         checkWhetherAuthor(memberId, post);
         postRepository.delete(post);

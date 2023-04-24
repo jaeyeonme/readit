@@ -14,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
@@ -89,16 +93,17 @@ class PostServiceTest {
 	@Test
 	@DisplayName("게시물 목록 조회 - 정상적인 요청으로 게시물 목록을 조회할 때")
 	void getAllPosts() throws Exception {
-	    // given
+		// given
 		List<Post> posts = Arrays.asList(testPost);
-		when(postRepository.findAll()).thenReturn(posts);
+		when(postRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(posts));
 
 		// when
-		List<PostResponse> result = postService.getAllPosts();
+		Pageable pageable = PageRequest.of(0, 10); // 첫 번째 페이지를 가져오고 페이지당 10개의 게시물을 가져오도록 설정합니다.
+		Page<PostResponse> result = postService.getAllPosts(pageable);
 
 		// then
-		assertEquals(posts.size(), result.size());
-		verify(postRepository, times(1)).findAll();
+		assertEquals(posts.size(), result.getNumberOfElements());
+		verify(postRepository, times(1)).findAll(any(Pageable.class));
 	}
 
 	@Test
