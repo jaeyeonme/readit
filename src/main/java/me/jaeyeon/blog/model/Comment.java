@@ -22,6 +22,7 @@ public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,6 +43,10 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void updateComment(String content) {
+        this.content = content;
+    }
+
     public void setPost(Post post) {
         if (this.post != null) {
             this.post.getComments().remove(this);
@@ -49,5 +54,9 @@ public class Comment extends BaseTimeEntity {
 
         this.post = post;
         post.getComments().add(this);
+    }
+
+    public boolean checkIsOwner(Long memberId) {
+        return this.member.getId().equals(memberId);
     }
 }

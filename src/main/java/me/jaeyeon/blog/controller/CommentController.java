@@ -1,65 +1,69 @@
 package me.jaeyeon.blog.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.dto.CommentDto;
+import javax.validation.Valid;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
-import javax.validation.Valid;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.dto.CommentReq;
+import me.jaeyeon.blog.dto.CommentRes;
+import me.jaeyeon.blog.service.CommentService;
 
-// @Api(value = "CRUD REST API for Comment")
-// @RestController
-// @RequiredArgsConstructor
-// @RequestMapping("/api")
-// public class CommentController {
-//
-//     private final CommentService commentService;
-//
-//     // http://localhost:8080/api/posts/{postId}/comments
-//     @ApiOperation(value = "Create Comment REST API")
-//     @PostMapping("/posts/{postId}/comments")
-//     public ResponseEntity<CommentDto> createComment(@PathVariable("postId") Long postId,
-//                                                     @RequestBody @Valid CommentDto commentDto) {
-//
-//         return new ResponseEntity<>(commentService.createComment(postId, commentDto), HttpStatus.CREATED);
-//     }
-//
-//     // http://localhost:8080/api/posts/{postId}/comments
-//     @ApiOperation(value = "Get All Comments By Post ID REST API")
-//     @GetMapping("/posts/{postId}/comments")
-//     public List<CommentDto> getCommentsByPostId(@PathVariable("postId") Long postId) {
-//         return commentService.getCommentsByPostId(postId);
-//     }
-//
-//     // http://localhost:8080/api/posts/{postId}/comments/{commentId}
-//     @ApiOperation(value = "Get Single Comment By ID REST API")
-//     @GetMapping("/posts/{postId}/comments/{commentId}")
-//     public ResponseEntity<CommentDto> getCommentById(@PathVariable("postId") Long postId,
-//                                                      @PathVariable("commentId") Long commentId) {
-//
-//         return new ResponseEntity<>(commentService.getCommentById(postId, commentId), HttpStatus.OK);
-//     }
-//
-//     // http://localhost:8080/api/posts/{postId}/comments/{commentId}
-//     @ApiOperation(value = "Delete Comment By ID REST API")
-//     @PutMapping("/posts/{postId}/comments/{commentId}")
-//     public ResponseEntity<CommentDto> getCommentsByPostId(@PathVariable("postId") Long postId,
-//                                                           @PathVariable("commentId") Long commentId,
-//                                                           @RequestBody @Valid CommentDto commentDto) {
-//
-//         return new ResponseEntity<>(commentService.updateCommentById(postId, commentId, commentDto), HttpStatus.OK);
-//     }
-//
-//     // http://localhost:8080/api/posts/{postId}/comments/{commentId}
-//     @DeleteMapping("/posts/{postId}/comments/{commentId}")
-//     public ResponseEntity<String> deleteCommentById(@PathVariable("postId") Long postId,
-//                                                     @PathVariable("commentId") Long commentId) {
-//
-//         commentService.deleteCommentById(postId, commentId);
-//         return new ResponseEntity<>("삭제 완료", HttpStatus.OK);
-//     }
-// }
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/posts/{postId}/comments")
+public class CommentController {
+
+    private final CommentService commentService;
+
+	@PostMapping
+	public ResponseEntity<Void> createComment(@Valid @RequestBody CommentReq commentReq,
+		@PathVariable Long postId,
+		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+		commentService.createComment(commentReq, memberId, postId);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@GetMapping
+	public ResponseEntity<Page<CommentRes>> getAllComment(@PathVariable Long postId,
+		@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+		Page<CommentRes> comments = commentService.getCommentsByPostId(postId, pageable);
+		return new ResponseEntity<>(comments, HttpStatus.OK);
+	}
+
+	@GetMapping("/{commentId}")
+	public ResponseEntity<CommentRes> getCommentById(@PathVariable Long commentId) {
+		CommentRes comment = commentService.getCommentById(commentId);
+		return new ResponseEntity<>(comment, HttpStatus.OK);
+	}
+
+	@PutMapping("/{commentId}")
+	public ResponseEntity<Void> updateComment(@PathVariable Long commentId,
+		@Valid @RequestBody CommentReq commentReq,
+		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+		commentService.updateComment(commentId, commentReq, memberId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{commentId}")
+	public ResponseEntity<Void> deleteComment(@PathVariable Long commentId,
+		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+		commentService.deleteComment(commentId, memberId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+}

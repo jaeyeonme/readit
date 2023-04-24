@@ -1,9 +1,11 @@
 package me.jaeyeon.blog.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,8 +39,9 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
-        List<PostResponse> postResponses = postService.getAllPosts();
+    public ResponseEntity<Page<PostResponse>> getAllPosts(
+        @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostResponse> postResponses = postService.getAllPosts(pageable);
         return new ResponseEntity<>(postResponses, HttpStatus.OK);
     }
 
@@ -50,18 +53,16 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
-                                            @PathVariable("id") Long id,
-                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.checkAuthor(memberId, id);
-        postService.updatePost(postReq, id);
+        @PathVariable("id") Long id,
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.updatePost(postReq, id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
-                                            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.checkAuthor(memberId, id);
-        postService.deletePostById(id);
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.deletePostById(id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

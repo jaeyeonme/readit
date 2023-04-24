@@ -1,6 +1,7 @@
 package me.jaeyeon.blog.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -15,6 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -79,25 +85,32 @@ class PostControllerTest {
 		PostResponse postResponse1 = new PostResponse(post1);
 		PostResponse postResponse2 = new PostResponse(post2);
 		List<PostResponse> postResponses = Arrays.asList(postResponse1, postResponse2);
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+		Page<PostResponse> postResponsePage = new PageImpl<>(postResponses, pageable, postResponses.size());
 
-		given(postService.getAllPosts()).willReturn(postResponses);
+		given(postService.getAllPosts(any(Pageable.class))).willReturn(postResponsePage);
 
 		// when
-		mockMvc.perform(get("/api/posts"))
+		mockMvc.perform(get("/api/posts")
+				.param("page", "0")
+				.param("size", "10")
+				.param("sort", "createdDate,desc"))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(2)))
-			.andExpect(jsonPath("$[0].title", is("Test Title 1")))
-			.andExpect(jsonPath("$[0].content", is("Test Content 1")))
-			.andExpect(jsonPath("$[1].title", is("Test Title 2")))
-			.andExpect(jsonPath("$[1].content", is("Test Content 2")));
+			.andExpect(jsonPath("$.content", hasSize(2)))
+			.andExpect(jsonPath("$.content[0].title", is("Test Title 1")))
+			.andExpect(jsonPath("$.content[0].content", is("Test Content 1")))
+			.andExpect(jsonPath("$.content[1].title", is("Test Title 2")))
+			.andExpect(jsonPath("$.content[1].content", is("Test Content 2")));
 
 		// then
-		verify(postService, times(1)).getAllPosts();
+		verify(postService, times(1)).getAllPosts(any(Pageable.class));
 	}
 
+
+
 	@Test
-	@DisplayName("게시물 조회 테스트 - 성공 (딴일 게시글)")
+	@DisplayName("게시물 조회 테스트 - 성공 (단일 게시글)")
 	void getPostByIdTest_Success() throws Exception {
 	    // given
 		Member author = TestHelper.createTestMember(1L, "Test User", "test@example.com", "password");
@@ -132,23 +145,20 @@ class PostControllerTest {
 			.andExpect(status().isOk());
 
 		// then
-		verify(postService, times(1)).checkAuthor(memberID, postID);
-		verify(postService, times(1)).updatePost(postReq, postID);
-
+		verify(postService, times(1)).updatePost(postReq, postID, memberID);
 	}
 
 	@Test
 	@DisplayName("게시물 삭제 테스트 - 성공")
 	void deletePostTest_Success() throws Exception {
-	    // when
+		// when
 		mockMvc.perform(delete("/api/posts/{id}", postID)
 				.session(mockSession))
 			.andDo(print())
 			.andExpect(status().isOk());
 
-	    // then
-		verify(postService, times(1)).checkAuthor(memberID, postID);
-		verify(postService, times(1)).deletePostById(postID);
+		// then
+		verify(postService, times(1)).deletePostById(postID, memberID);
 	}
 
 	static class TestHelper {
