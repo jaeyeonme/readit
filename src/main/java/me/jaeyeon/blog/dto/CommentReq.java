@@ -18,10 +18,15 @@ public class CommentReq {
     private String content;
 
     public Comment toEntity(Member member, Post post) {
+        return toEntity(member, post, null);
+    }
+
+    public Comment toEntity(Member member, Post post, Comment parent) {
         return Comment.builder()
             .member(member)
             .post(post)
             .content(content)
+            .parent(parent)
             .build();
     }
 }

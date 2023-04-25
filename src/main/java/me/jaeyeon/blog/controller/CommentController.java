@@ -32,10 +32,18 @@ public class CommentController {
     private final CommentService commentService;
 
 	@PostMapping
-	public ResponseEntity<Void> createComment(@Valid @RequestBody CommentReq commentReq,
+	public ResponseEntity<Void> createComment(@RequestBody @Valid CommentReq commentReq,
 		@PathVariable Long postId,
 		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
 		commentService.createComment(commentReq, memberId, postId);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@PostMapping("/{commentId}")
+	public ResponseEntity<Void> createReplyComment(@RequestBody @Valid CommentReq commentReq,
+		@PathVariable Long postId, @PathVariable Long commentId,
+		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+		commentService.saveReplyComment(commentId, commentReq, memberId, postId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
