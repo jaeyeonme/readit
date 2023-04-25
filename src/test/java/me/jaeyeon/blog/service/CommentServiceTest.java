@@ -45,6 +45,7 @@ class CommentServiceTest {
 	private Member testMember;
 	private Post testPost;
 	private Comment testComment;
+	private Comment testReplyComment;
 
 	@BeforeEach
 	void setUp() {
@@ -66,6 +67,15 @@ class CommentServiceTest {
 			.member(testMember)
 			.post(testPost)
 			.build();
+		testComment.setId(1L);
+
+		testReplyComment = Comment.builder()
+			.content("Test Reply Comment")
+			.member(testMember)
+			.post(testPost)
+			.parent(testComment)
+			.build();
+
 	}
 
 	@Test
@@ -87,6 +97,30 @@ class CommentServiceTest {
 		assertEquals(comment.getId(), commentId);
 		verify(memberService, times(1)).getMember(1L);
 		verify(postService, times(1)).findPostById(1L);
+		verify(commentRepository, times(1)).save(any(Comment.class));
+	}
+
+	@Test
+	@DisplayName("대댓글 생성 테스트")
+	void createReplyCommentTest() throws Exception {
+	    // given
+		CommentReq replyCommentReq = new CommentReq("Test Reply Comment");
+
+		when(memberService.getMember(1L)).thenReturn(testMember);
+		when(postService.findPostById(1L)).thenReturn(testPost);
+		when(commentRepository.findById(eq(testComment.getId()))).thenReturn(ofNullable(testComment));
+
+		Comment replyComment = replyCommentReq.toEntity(testMember, testPost, testComment);
+		when(commentRepository.save(any(Comment.class))).thenReturn(replyComment);
+
+		// when
+		Long replyCommentId = commentService.saveReplyComment(testComment.getId(), replyCommentReq, 1L, 1L);
+
+		// then
+		assertEquals(replyComment.getId(), replyCommentId);
+		verify(memberService, times(1)).getMember(1L);
+		verify(postService, times(1)).findPostById(1L);
+		verify(commentRepository, times(1)).findById(any(Long.class));
 		verify(commentRepository, times(1)).save(any(Comment.class));
 	}
 

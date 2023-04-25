@@ -1,5 +1,9 @@
 package me.jaeyeon.blog.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,11 +41,28 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
+
     @Builder
-    private Comment(Member member, Post post, String content) {
+    private Comment(Member member, Post post, String content, Comment parent) {
         this.member = member;
         this.post = post;
         this.content = content;
+        if (parent != null) {
+            setParent(parent);
+        }
+    }
+
+    public void setParent(Comment parent) {
+        this.parent = parent;
+        if (parent != null) {
+            parent.getChildren().add(this);
+        }
     }
 
     public void updateComment(String content) {
@@ -58,5 +80,9 @@ public class Comment extends BaseTimeEntity {
 
     public boolean checkIsOwner(Long memberId) {
         return this.member.getId().equals(memberId);
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

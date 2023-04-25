@@ -77,6 +77,24 @@ class CommentControllerTest {
 	}
 
 	@Test
+	@DisplayName("대댓글 생성 테스트 - 성공")
+	void createReplyCommentTest() throws Exception {
+	    // given
+		CommentReq replyCommentReq = new CommentReq("Test Reply Comment");
+
+	    // when
+		mockMvc.perform(post("/api/posts/{postID}/comments/{commentID}", postID, commentID)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(replyCommentReq))
+				.session(mockSession))
+			.andDo(print())
+			.andExpect(status().isCreated());
+
+	    // then
+		verify(commentService, times(1)).saveReplyComment(commentID, replyCommentReq, postID, memberID);
+	}
+
+	@Test
 	@DisplayName("댓글 목록 조회 테스트 - 성공")
 	void getAllCommentsTest() throws Exception {
 		// given

@@ -45,6 +45,21 @@ public class CommentService {
         return savedComment.getId();
     }
 
+    public Long saveReplyComment(Long commentId, CommentReq request, Long postId, Long memberId) {
+        // 부모 댓글, 회원, 게시글 정보를 가져오기
+        Comment parentComment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new BlogApiException(ErrorCode.COMMENT_NOT_FOUND));
+        Member member = memberService.getMember(memberId);
+        Post post = postService.findPostById(postId);
+
+        // CommentReq 객체를 이용하여 대댓글 객체를 생성
+        Comment childComment = request.toEntity(member, post, parentComment);
+
+        // 생성한 대댓글 객체를 저장하고 반환
+        Comment savedComment = commentRepository.save(childComment);
+        return savedComment.getId();
+    }
+
     @Transactional(readOnly = true)
     public Page<CommentRes> getCommentsByPostId(Long postId, Pageable pageable) {
         return commentRepository.findAllByPost_Id(postId, pageable).map(CommentRes::new);
