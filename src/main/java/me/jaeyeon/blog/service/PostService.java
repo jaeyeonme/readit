@@ -35,7 +35,18 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostResponse> getAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).map(PostResponse::new);
+        Page<PostResponse> result = postRepository.findAll(pageable).map(PostResponse::new);
+        log.info("Retrieved {} posts", result.getNumberOfElements());
+        return result;
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<PostResponse> searchPostsWithKeyword(String keyword, Pageable pageable) {
+        Page<PostResponse> result = postRepository.findByTitleContainingOrContentContaining(keyword, pageable)
+            .map(PostResponse::new);
+        log.info("Retrieved {} posts with keyword: {}", result.getNumberOfElements(), keyword);
+        return result;
     }
 
     @Transactional(readOnly = true)
