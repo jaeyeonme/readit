@@ -2,6 +2,7 @@ package me.jaeyeon.blog.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -76,40 +77,6 @@ class PostControllerTest {
 	}
 
 	@Test
-	@DisplayName("게시물 조회 테스트 - 성공")
-	void getAllPostsTest_Success() throws Exception {
-		// given
-		Member author = TestHelper.createTestMember(1L, "Test User", "test@example.com", "password");
-		Post post1 = Post.builder().title("Test Title 1").content("Test Content 1").author(author).build();
-		Post post2 = Post.builder().title("Test Title 2").content("Test Content 2").author(author).build();
-		PostResponse postResponse1 = new PostResponse(post1);
-		PostResponse postResponse2 = new PostResponse(post2);
-		List<PostResponse> postResponses = Arrays.asList(postResponse1, postResponse2);
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-		Page<PostResponse> postResponsePage = new PageImpl<>(postResponses, pageable, postResponses.size());
-
-		given(postService.getAllPosts(any(Pageable.class))).willReturn(postResponsePage);
-
-		// when
-		mockMvc.perform(get("/api/posts")
-				.param("page", "0")
-				.param("size", "10")
-				.param("sort", "createdDate,desc"))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content", hasSize(2)))
-			.andExpect(jsonPath("$.content[0].title", is("Test Title 1")))
-			.andExpect(jsonPath("$.content[0].content", is("Test Content 1")))
-			.andExpect(jsonPath("$.content[1].title", is("Test Title 2")))
-			.andExpect(jsonPath("$.content[1].content", is("Test Content 2")));
-
-		// then
-		verify(postService, times(1)).getAllPosts(any(Pageable.class));
-	}
-
-
-
-	@Test
 	@DisplayName("게시물 조회 테스트 - 성공 (단일 게시글)")
 	void getPostByIdTest_Success() throws Exception {
 	    // given
@@ -128,6 +95,40 @@ class PostControllerTest {
 
 	    // then
 		verify(postService, times(1)).getPostById(postID);
+	}
+
+	@Test
+	@DisplayName("게시물 키워드 검색 테스트 - 성공")
+	void getPostsWithKeywordTest_Success() throws Exception {
+		// given
+		String keyword = "Test";
+		Member author = TestHelper.createTestMember(1L, "Test User", "test@example.com", "password");
+		Post post1 = Post.builder().title("Test Title 1").content("Test Content 1").author(author).build();
+		Post post2 = Post.builder().title("Test Title 2").content("Test Content 2").author(author).build();
+		PostResponse postResponse1 = new PostResponse(post1);
+		PostResponse postResponse2 = new PostResponse(post2);
+		List<PostResponse> postResponses = Arrays.asList(postResponse1, postResponse2);
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+		Page<PostResponse> postResponsePage = new PageImpl<>(postResponses, pageable, postResponses.size());
+
+		given(postService.searchPostsWithKeyword(eq(keyword), any(Pageable.class))).willReturn(postResponsePage);
+
+		// when
+		mockMvc.perform(get("/api/posts")
+				.param("keyword", keyword)
+				.param("page", "0")
+				.param("size", "10")
+				.param("sort", "createdDate,desc"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content", hasSize(2)))
+			.andExpect(jsonPath("$.content[0].title", is("Test Title 1")))
+			.andExpect(jsonPath("$.content[0].content", is("Test Content 1")))
+			.andExpect(jsonPath("$.content[1].title", is("Test Title 2")))
+			.andExpect(jsonPath("$.content[1].content", is("Test Content 2")));
+
+		// then
+		verify(postService, times(1)).searchPostsWithKeyword(eq(keyword), any(Pageable.class));
 	}
 
 	@Test

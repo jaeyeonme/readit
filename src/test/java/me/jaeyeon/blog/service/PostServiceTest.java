@@ -91,22 +91,6 @@ class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("게시물 목록 조회 - 정상적인 요청으로 게시물 목록을 조회할 때")
-	void getAllPosts() throws Exception {
-		// given
-		List<Post> posts = Arrays.asList(testPost);
-		when(postRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(posts));
-
-		// when
-		Pageable pageable = PageRequest.of(0, 10); // 첫 번째 페이지를 가져오고 페이지당 10개의 게시물을 가져오도록 설정합니다.
-		Page<PostResponse> result = postService.getAllPosts(pageable);
-
-		// then
-		assertEquals(posts.size(), result.getNumberOfElements());
-		verify(postRepository, times(1)).findAll(any(Pageable.class));
-	}
-
-	@Test
 	@DisplayName("게시물 조회 - 정상적인 요청으로 특정 게시물을 조회할 때")
 	void getPostById() throws Exception {
 		// given
@@ -122,6 +106,24 @@ class PostServiceTest {
 		assertEquals(testPost.getCreatedDate(), result.getCreatedDate());
 		assertEquals(testPost.getModifiedDate(), result.getModifiedDate());
 		verify(postRepository, times(1)).findById(anyLong());
+	}
+
+	@Test
+	@DisplayName("게시물 검색 - 정상적인 요청으로 게시물을 검색할 때")
+	void searchPostsWithKeyword() throws Exception {
+	    // given
+		List<Post> posts = Arrays.asList(testPost);
+		String keyword = "Test";
+		when(postRepository.findByTitleContainingOrContentContaining(anyString(), any(Pageable.class)))
+			.thenReturn(new PageImpl<>(posts));
+
+	    // when
+		PageRequest pageable = PageRequest.of(0, 10);
+		Page<PostResponse> result = postService.searchPostsWithKeyword(keyword, pageable);
+
+	    // then
+		assertEquals(posts.size(), result.getNumberOfElements());
+		verify(postRepository, times(1)).findByTitleContainingOrContentContaining(anyString(), any(Pageable.class));
 	}
 
 	@Test

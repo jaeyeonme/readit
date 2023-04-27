@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -39,10 +40,10 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PostResponse>> getAllPosts(
+    public ResponseEntity<Page<PostResponse>> getPostsWithKeyword(
+        @RequestParam(value = "keyword", defaultValue = "") String keyword,
         @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostResponse> postResponses = postService.getAllPosts(pageable);
-        return new ResponseEntity<>(postResponses, HttpStatus.OK);
+        return new ResponseEntity<>(postService.searchPostsWithKeyword(keyword, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

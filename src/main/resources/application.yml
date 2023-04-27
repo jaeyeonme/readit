@@ -9,11 +9,12 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
+        metadata_builder_contributor: me.jaeyeon.blog.config.SqlFunctionsMetadataBuilderContributor
         dialect: org.hibernate.dialect.H2Dialect
   h2:
     console:
@@ -33,9 +34,10 @@ spring:
   # JPA
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
         format_sql: true
+        metadata_builder_contributor: me.jaeyeon.blog.config.SqlFunctionsMetadataBuilderContributor
         dialect: org.hibernate.dialect.MySQL8Dialect
