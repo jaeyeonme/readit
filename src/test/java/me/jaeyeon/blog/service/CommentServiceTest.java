@@ -37,10 +37,10 @@ class CommentServiceTest {
 	private CommentRepository commentRepository;
 
 	@Mock
-	private PostService postService;
+	private BlogPostService postService;
 
 	@Mock
-	private MemberService memberService;
+	private GeneralMemberService memberService;
 
 	private Member testMember;
 	private Post testPost;

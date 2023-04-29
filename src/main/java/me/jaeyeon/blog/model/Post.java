@@ -16,12 +16,16 @@ import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import me.jaeyeon.blog.config.BaseTimeEntity;
 
 @Entity
 @Getter
+@ToString(exclude = {"comments"}, callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity {
 
@@ -53,9 +57,5 @@ public class Post extends BaseTimeEntity {
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-    }
-
-    public boolean isAuthor(Long memberId) {
-        return this.author.getId().equals(memberId);
     }
 }

@@ -29,12 +29,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import me.jaeyeon.blog.config.SessionConst;
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
 import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.model.Post;
-import me.jaeyeon.blog.service.PostService;
+import me.jaeyeon.blog.service.BlogPostService;
+import me.jaeyeon.blog.service.SessionLoginService;
 
 @WebMvcTest(PostController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -47,7 +47,7 @@ class PostControllerTest {
 	private ObjectMapper objectMapper;
 
 	@MockBean
-	private PostService postService;
+	private BlogPostService postService;
 
 	private MockHttpSession mockSession;
 	private Long postID;
@@ -56,7 +56,7 @@ class PostControllerTest {
 	@BeforeEach
 	public void setUp() {
 		mockSession = new MockHttpSession();
-		mockSession.setAttribute(SessionConst.LOGIN_MEMBER, 1L);
+		mockSession.setAttribute(SessionLoginService.MEMBER_ID, 1L);
 		postID = 1L;
 		memberID = 1L;
 	}

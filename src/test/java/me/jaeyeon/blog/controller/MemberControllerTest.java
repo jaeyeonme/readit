@@ -8,37 +8,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.lang.reflect.Field;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.jaeyeon.blog.config.WebConfig;
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
-import me.jaeyeon.blog.dto.MemberRegistrationRes;
 import me.jaeyeon.blog.dto.MemberSignIn;
 import me.jaeyeon.blog.exception.BlogApiException;
 import me.jaeyeon.blog.exception.EmailAlreadyExistsException;
 import me.jaeyeon.blog.exception.ErrorCode;
 import me.jaeyeon.blog.model.Member;
-import me.jaeyeon.blog.repository.MemberRepository;
+import me.jaeyeon.blog.service.LoginService;
 import me.jaeyeon.blog.service.MemberService;
 
 @Import(WebConfig.class)
@@ -57,6 +47,9 @@ class MemberControllerTest {
 
 	@MockBean
 	private MemberService memberService;
+
+	@MockBean
+	private LoginService loginService;
 
 	@Test
 	@DisplayName("회원 가입 API 테스트 - 성공")
@@ -106,7 +99,10 @@ class MemberControllerTest {
 		// given
 		Member member = createMember(1L, "test", "test@email.com", "P@ssw0rd!");
 		MemberSignIn signIn = new MemberSignIn("test@email.com", "P@ssw0rd!");
-		given(memberService.signIn(signIn)).willReturn(member);
+
+		given(memberService.findByEmail(signIn.getEmail())).willReturn(member);
+		doNothing().when(memberService).checkPassword(signIn.getPassword(), member);
+		doNothing().when(loginService).login(signIn.getEmail(), signIn.getPassword());
 
 		// when
 		mockMvc.perform(post("/members/sign-in")
@@ -116,12 +112,13 @@ class MemberControllerTest {
 			.andExpect(status().isOk());
 	}
 
+
 	@Test
 	@DisplayName("로그인 실패")
 	void signInFailure() throws Exception {
 		// given
 		MemberSignIn signIn = new MemberSignIn("nonexistent@email.com", "wrong_password");
-		given(memberService.signIn(signIn)).willThrow(new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+		doThrow(new BlogApiException(ErrorCode.MEMBER_NOT_FOUND)).when(loginService).login(signIn.getEmail(), signIn.getPassword());
 
 		// when
 		mockMvc.perform(post("/members/sign-in")

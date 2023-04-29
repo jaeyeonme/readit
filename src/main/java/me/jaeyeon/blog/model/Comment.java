@@ -16,12 +16,16 @@ import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import me.jaeyeon.blog.config.BaseTimeEntity;
 
 @Entity
 @Getter
+@ToString(exclude = {"post", "parent", "children"}, callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
 

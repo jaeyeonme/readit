@@ -8,12 +8,16 @@ import javax.persistence.Id;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import me.jaeyeon.blog.config.BaseTimeEntity;
 
 @Entity
 @Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 

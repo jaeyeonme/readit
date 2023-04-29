@@ -1,7 +1,5 @@
 package me.jaeyeon.blog.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -12,11 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.config.SessionConst;
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
-import me.jaeyeon.blog.dto.MemberRegistrationRes;
 import me.jaeyeon.blog.dto.MemberSignIn;
-import me.jaeyeon.blog.model.Member;
+import me.jaeyeon.blog.service.LoginService;
 import me.jaeyeon.blog.service.MemberService;
 
 @RestController
@@ -25,6 +21,7 @@ import me.jaeyeon.blog.service.MemberService;
 public class MemberController {
 
 	private final MemberService memberService;
+	private final LoginService loginService;
 
 	@PostMapping("/register")
 	public ResponseEntity<Void> register(@RequestBody @Valid MemberRegistrationReq request) {
@@ -33,20 +30,18 @@ public class MemberController {
 	}
 
 	@PostMapping("/sign-in")
-	public ResponseEntity<Void> signIn(@RequestBody @Valid MemberSignIn signIn, HttpServletRequest request) {
-		Member loginMember = memberService.signIn(signIn);
-		HttpSession httpSession = request.getSession();
-		httpSession.setAttribute(SessionConst.LOGIN_MEMBER, loginMember.getEmail());
+	public ResponseEntity<Void> signIn(@RequestBody @Valid MemberSignIn signIn) {
+		String email = signIn.getEmail();
+		String password = signIn.getPassword();
+
+		loginService.login(email, password);
 
 		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<Void> logout(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session != null) {
-			session.invalidate();
-		}
+	public ResponseEntity<Void> logout() {
+		loginService.logout();
 		return ResponseEntity.ok().build();
 	}
 }

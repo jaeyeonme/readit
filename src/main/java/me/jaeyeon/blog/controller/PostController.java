@@ -17,24 +17,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.annotation.AuthenticationRequired;
+import me.jaeyeon.blog.annotation.CurrentMember;
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
-import me.jaeyeon.blog.service.PostService;
+import me.jaeyeon.blog.service.BlogPostService;
 
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostService postService;
+    private final BlogPostService postService;
 
+    @AuthenticationRequired
     @PostMapping
     public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        @CurrentMember Long memberId) {
         postService.createPost(postReq, memberId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -52,17 +53,17 @@ public class PostController {
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
+    @AuthenticationRequired
     @PutMapping("/{id}")
     public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
-        @PathVariable("id") Long id,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        @PathVariable("id") Long id, @CurrentMember Long memberId) {
         postService.updatePost(postReq, id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @AuthenticationRequired
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id, @CurrentMember Long memberId) {
         postService.deletePostById(id, memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

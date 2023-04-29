@@ -23,8 +23,8 @@ import me.jaeyeon.blog.repository.CommentRepository;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostService postService;
-    private final MemberService memberService;
+    private final BlogPostService postService;
+    private final GeneralMemberService memberService;
 
     public Long createComment(CommentReq commentReq, Long memberId, Long postId) {
         // 회원 존재 확인
