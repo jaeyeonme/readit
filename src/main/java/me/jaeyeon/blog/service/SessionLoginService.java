@@ -1,9 +1,8 @@
 package me.jaeyeon.blog.service;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.model.Member;
 

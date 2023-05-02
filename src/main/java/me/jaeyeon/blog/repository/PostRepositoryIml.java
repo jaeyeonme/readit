@@ -30,7 +30,7 @@ public class PostRepositoryIml implements PostRepositoryCustom {
 
 		long total = queryFactory.selectFrom(post)
 			.where(matchAgainstTitleAndContent(keyword).gt(0))
-			.fetchCount();
+			.fetch().size();
 
 		return new PageImpl<>(posts, pageable, total);
 	}

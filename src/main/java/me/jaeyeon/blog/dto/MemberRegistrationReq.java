@@ -1,15 +1,18 @@
 package me.jaeyeon.blog.dto;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import me.jaeyeon.blog.model.Member;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberRegistrationReq {
 
 	@NotBlank(message = "유저 이름 입력은 필수입니다.")
