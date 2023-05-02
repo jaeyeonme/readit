@@ -1,26 +1,34 @@
 # 블로그 프로젝트
 ---------
-## (게시글) API 명세서
+## 게시글 API 명세서
 |HTTP Method|URL Path|Status Code|Description|
 |:-----:|:-----:|:-----:|:-----:|
-| GET | /api/posts | 200 (OK) | 모든 게시글 가져오기 |
-| GET | /api/posts/{id} | 200 (OK) | 한 개의 게시글 가져오기 |
 | POST | /api/posts | 201 (Created) | 새로운 게시글 작성 |
-| PUT | /api/posts/{id} | 200 (OK) | 게시글 ID로 게시글 수정 |
+| GET | /api/posts | 200 (OK) | 모든 게시글 가져오기 (키워드 검색 가능) |
+| GET | /api/posts/{id} | 200 (OK) | 게시글 ID로 가져오기 |
+| PUT | /api/posts/{id} | 200 (OK) | 게시글 ID로 수정 |
 | DELETE | /api/posts/{id} | 200 (OK) | 게시글 ID로 삭제 |
-| GET | /api/posts?pageSize=5&pageNo=1&sortBy=firstName | 200 (OK) | 게시글 페이징 |
-
 
 <br>
 
-## (댓글) API 명세서
+## 댓글 API 명세서
 |HTTP Method|URL Path|Status Code|Description|
 |:-----:|:-----:|:-----:|:-----:|
-| GET | /api/posts/{postId}/comments | 200 (OK) | 게시글 ID에 해당하는 댓글 가져오기 |
-| GET | /api/posts/{postId}/comments/{id} | 200 (OK) | 게시글 ID에 대항하는 댓글 있으면 가져오기 |
 | POST | /api/posts/{postId}/comments | 201 (Created) | 새로운 댓글 작성 |
-| PUT | /api/posts/{postId}/comments/{id} | 200 (OK) | 게시글 ID로 댓글이 있다면 댓글 수정 |
-| DELETE | /api/posts/{postId}/comments/{id} | 200 (OK) | 게시글 ID로 삭제 |
+| POST | /api/posts/{postId}/comments/{commentId} | 201 (Created) | 대댓글 |
+| GET | /api/posts/{postId}/comments | 200 (OK) | 게시글에 해당하는 댓글 가져오기 |
+| GET | /api/posts/{postId}/comments/{commentId} | 200 (OK) | 댓글 ID로 가져오기 |
+| PUT | /api/posts/{postId}/comments/{commentId} | 200 (OK) | 댓글 ID로 수정 |
+| DELETE | /api/posts/{postId}/comments/{commentId} | 200 (OK) | 댓글 ID로 삭제 |
+
+<br>
+
+## 멤버 API 명세서
+|HTTP Method|URL Path|Status Code|Description|
+|:-----:|:-----:|:-----:|:-----:|
+| POST | /members/register | 201 (Created) | 회원가입 |
+| POST | /members/sign-in | 200 (OK) | 로그인 |
+| POST | /members/logout | 200 (OK) | 로그아웃 |
 
 
 <br>
