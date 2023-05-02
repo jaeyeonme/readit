@@ -16,12 +16,16 @@ import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import me.jaeyeon.blog.config.BaseTimeEntity;
 
 @Entity
 @Getter
+@ToString(exclude = {"post", "parent", "children"}, callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
 
@@ -32,7 +36,7 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -49,8 +53,8 @@ public class Comment extends BaseTimeEntity {
     private List<Comment> children = new ArrayList<>();
 
     @Builder
-    private Comment(Member member, Post post, String content, Comment parent) {
-        this.member = member;
+    private Comment(Member author, Post post, String content, Comment parent) {
+        this.author = author;
         this.post = post;
         this.content = content;
         if (parent != null) {
@@ -76,10 +80,6 @@ public class Comment extends BaseTimeEntity {
 
         this.post = post;
         post.getComments().add(this);
-    }
-
-    public boolean checkIsOwner(Long memberId) {
-        return this.member.getId().equals(memberId);
     }
 
     public void setId(Long id) {

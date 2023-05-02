@@ -13,24 +13,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.config.TestMvcConfig;
 import me.jaeyeon.blog.dto.CommentReq;
 import me.jaeyeon.blog.dto.CommentRes;
 import me.jaeyeon.blog.model.Comment;
-import me.jaeyeon.blog.service.CommentService;
+import me.jaeyeon.blog.model.Member;
+import me.jaeyeon.blog.resolver.TestMemberArgumentResolver;
+import me.jaeyeon.blog.service.BlogCommentService;
+import me.jaeyeon.blog.service.LoginService;
+import me.jaeyeon.blog.testHelper.TestHelper;
 
+@Import(TestMvcConfig.class)
 @WebMvcTest(CommentController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class CommentControllerTest {
@@ -42,12 +51,15 @@ class CommentControllerTest {
 	private ObjectMapper objectMapper;
 
 	@MockBean
-	private CommentService commentService;
+	private BlogCommentService commentService;
 
+	@MockBean
+	private LoginService loginService;
 	private MockHttpSession mockSession;
 	private Long postID;
 	private Long memberID;
 	private Long commentID;
+	private Member member;
 
 	@BeforeEach
 	public void setUp() {
@@ -56,15 +68,30 @@ class CommentControllerTest {
 		commentID = 1L;
 		postID = 1L;
 		memberID = 1L;
+
+		// 멤버 초기화
+		member = TestHelper.createTestMember(memberID, "Test User", "test@example.com", "password");
+
+		createCommentController();
+	}
+
+
+	private void createCommentController() {
+		TestMemberArgumentResolver testMemberArgumentResolver = new TestMemberArgumentResolver();
+		PageableHandlerMethodArgumentResolver pageableResolver = new PageableHandlerMethodArgumentResolver();
+
+		mockMvc = MockMvcBuilders.standaloneSetup(new CommentController(commentService))
+			.setCustomArgumentResolvers(testMemberArgumentResolver, pageableResolver)
+			.build();
 	}
 
 	@Test
 	@DisplayName("댓글 생성 테스트 - 성공")
 	void createCommentTest() throws Exception {
-	    // given
+		// given
 		CommentReq commentReq = new CommentReq("Test Comment");
 
-	    // when
+		// when
 		mockMvc.perform(post("/api/posts/{postID}/comments", postID)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(commentReq))
@@ -72,17 +99,17 @@ class CommentControllerTest {
 			.andDo(print())
 			.andExpect(status().isCreated());
 
-	    // then
-		verify(commentService, times(1)).createComment(commentReq, memberID, postID);
+		// then
+		verify(commentService, times(1)).createComment(eq(commentReq), eq(postID), any(Member.class));
 	}
 
 	@Test
 	@DisplayName("대댓글 생성 테스트 - 성공")
 	void createReplyCommentTest() throws Exception {
-	    // given
+		// given
 		CommentReq replyCommentReq = new CommentReq("Test Reply Comment");
 
-	    // when
+		// when
 		mockMvc.perform(post("/api/posts/{postID}/comments/{commentID}", postID, commentID)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(replyCommentReq))
@@ -90,8 +117,8 @@ class CommentControllerTest {
 			.andDo(print())
 			.andExpect(status().isCreated());
 
-	    // then
-		verify(commentService, times(1)).saveReplyComment(commentID, replyCommentReq, postID, memberID);
+		// then
+		verify(commentService, times(1)).saveReplyComment(eq(commentID), eq(replyCommentReq), any(Member.class), eq(postID));
 	}
 
 	@Test
@@ -156,10 +183,10 @@ class CommentControllerTest {
 	@Test
 	@DisplayName("댓글 수정 테스트 - 성공")
 	void updateCommentTest() throws Exception {
-	    // given
+		// given
 		CommentReq commentReq = new CommentReq("Test Comment");
 
-	    // when
+		// when
 		mockMvc.perform(put("/api/posts/{postId}/comments/{commentId}", postID, commentID)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(commentReq))
@@ -167,20 +194,20 @@ class CommentControllerTest {
 			.andDo(print())
 			.andExpect(status().isOk());
 
-	    // then
-		verify(commentService, times(1)).updateComment(commentID, commentReq, memberID);
+		// then
+		verify(commentService, times(1)).updateComment(commentID, commentReq, member);
 	}
 
 	@Test
 	@DisplayName("댓글 삭제 테스트 - 성공")
 	void deleteCommentTest() throws Exception {
-	    // when
+		// when
 		mockMvc.perform(delete("/api/posts/{postId}/comments/{commentId}", postID, commentID)
 				.session(mockSession))
 			.andDo(print())
 			.andExpect(status().isOk());
 
-	    // then
-		verify(commentService, times(1)).deleteComment(commentID, memberID);
+		// then
+		verify(commentService, times(1)).deleteComment(commentID, member);
 	}
 }

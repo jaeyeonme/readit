@@ -2,39 +2,34 @@ package me.jaeyeon.blog.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import me.jaeyeon.blog.config.SessionConst;
+import lombok.RequiredArgsConstructor;
+import me.jaeyeon.blog.annotation.AuthenticationRequired;
 import me.jaeyeon.blog.exception.ErrorCode;
+import me.jaeyeon.blog.exception.UnAuthenticatedAccessException;
+import me.jaeyeon.blog.service.LoginService;
 
+@Component
+@RequiredArgsConstructor
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
+	private final LoginService loginService;
+
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-		Object handler) throws Exception {
-
-		String requestURI = request.getRequestURI();
-		HttpSession session = request.getSession();
-
-		if (session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
-			if (requestURI.startsWith("/api/posts") && request.getMethod().equals("GET")) {
-				return true;
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			if (handlerMethod.hasMethodAnnotation(AuthenticationRequired.class)) {
+				Long memberId = loginService.getLoginMemberId();
+				if (memberId == null) {
+					throw new UnAuthenticatedAccessException(ErrorCode.UNAUTHENTICATED_ACCESS);
+				}
 			}
-
-			ErrorCode errorCode = ErrorCode.UNAUTHORIZED_MEMBER;
-			response.setStatus(errorCode.getHttpStatus().value());
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-
-			response.getWriter().write(
-				"{\"errorCode\":\"" + errorCode.getErrorCode() +
-					"\", \"errorMessage\":\"" + errorCode.getMessage() + "\"}"
-			);
-			return false;
 		}
-
 		return true;
 	}
 }

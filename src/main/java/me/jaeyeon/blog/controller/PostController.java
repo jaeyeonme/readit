@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.annotation.AuthenticationRequired;
+import me.jaeyeon.blog.annotation.CurrentMember;
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
+import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.service.PostService;
 
 @RestController
@@ -33,15 +34,15 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.createPost(postReq, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq, @CurrentMember Member member) {
+        postService.createPost(postReq, member);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getPostsWithKeyword(
-        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+        @RequestParam(value = "keyword", defaultValue = "", required = false) String keyword,
         @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return new ResponseEntity<>(postService.searchPostsWithKeyword(keyword, pageable), HttpStatus.OK);
     }
@@ -53,17 +54,17 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
-        @PathVariable("id") Long id,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.updatePost(postReq, id, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq, @PathVariable("id") Long id,
+        @CurrentMember Member member) {
+        postService.updatePost(postReq, id, member);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
-        @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        postService.deletePostById(id, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id, @CurrentMember Member member) {
+        postService.deletePostById(id, member);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
