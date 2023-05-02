@@ -1,5 +1,3 @@
-# 블로그 프로젝트
----------
 ## 게시글 API 명세서
 |HTTP Method|URL Path|Status Code|Description|
 |:-----:|:-----:|:-----:|:-----:|
