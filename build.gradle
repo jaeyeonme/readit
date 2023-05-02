@@ -63,37 +63,37 @@ jacocoTestReport {
 	finalizedBy 'jacocoTestCoverageVerification'
 }
 
-//jacocoTestCoverageVerification {
-//	violationRules {
-//		rule {
-//			enabled = true // 활성화
-//			element = 'CLASS' // 클래스 단위로 커버리지 체크
-//			// includes = []
-//
-//			// 라인 커버리지 제한을 70%로 설정
-//			limit {
-//				counter = 'LINE'
-//				value = 'COVEREDRATIO'
-//				minimum = 0.70
-//			}
-//
-//			// 브랜치 커버리지 제한을 50%로 설정
-//			limit {
-//				counter = 'BRANCH'
-//				value = 'COVEREDRATIO'
-//				minimum = 0.50
-//			}
-//
-//			// 빈 줄을 제외한 코드의 라인수를 최대 100라인으로 제한합니다.
-//			limit {
-//				counter = 'LINE'
-//				value = 'TOTALCOUNT'
-//				maximum = 100
-//			}
-//			//excludes = []
-//		}
-//	}
-//}
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true // 활성화
+			element = 'CLASS' // 클래스 단위로 커버리지 체크
+			// includes = []
+
+			// 라인 커버리지 제한을 70%로 설정
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.70
+			}
+
+			// 브랜치 커버리지 제한을 50%로 설정
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.50
+			}
+
+			// 빈 줄을 제외한 코드의 라인수를 최대 100라인으로 제한합니다.
+			limit {
+				counter = 'LINE'
+				value = 'TOTALCOUNT'
+				maximum = 100
+			}
+			//excludes = []
+		}
+	}
+}
 
 //Querydsl 추가, 자동 생성된 Q클래스 gradle clean으로 제거
 clean {
