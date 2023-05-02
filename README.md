@@ -16,15 +16,21 @@
 <br>
 <br>
 
-## ✏ Architecture
+## ✏ Project Structure
 <p align="left">
-  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235721443-4edbcf0f-a58d-4404-bc46-30752f7adb38.png" width="70%"/></div>
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235721443-4edbcf0f-a58d-4404-bc46-30752f7adb38.png" width="50%"/></div>
   <br>  
 </p>
 
 
 <br>
 <br>
+
+## ✏ Architecture
+<p align="left">
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235740199-636ddcf7-0e5f-4155-a6da-82108f5c0d40.png" width="50%"/></div>
+  <br>  
+</p>
 
 
 ## 게시글 API 명세서
