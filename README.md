@@ -32,6 +32,17 @@
   <br>  
 </p>
 
+**3-Tier-Architecture** 적용
+1. **Separation of Concerns (SoC)**: 각 계층은 명확한 역할과 책임을 가지고 있어, 각 계층의 관심사를 분리할 수 있습니다. 이로 인해 코드의 가독성과 유지 보수성이 향상됩니다.
+2. **Scalability**: 3-tier Architecture**: 각 계층을 독립적으로 확장할 수 있도록 지원합니다. 이는 프로젝트의 성장에 따라 성능과 안정성을 유지할 수 있게 해줍니다.
+3. **Modularity**: 계층 간의 느슨한 결합(loose coupling)을 통해, 개별 계층을 독립적으로 개발, 테스트 및 배포할 수 있습니다. 이를 통해 개발 효율성과 개별 기능의 확장성이 향상됩니다.
+4. **Reusability**: 계층간의 인터페이스가 명확하게 정의되어 있으므로, 각 계층의 구성 요소를 재사용할 수 있습니다. 이를 통해 코드의 중복을 줄이고 개발 시간을 절약할 수 있습니다.
+5. **Maintainability**: 3-tier Architecture는 각 계층의 변경 사항이 다른 계층에 최소한의 영향을 미치도록 합니다. 따라서 유지 보수가 용이하며, 프로젝트의 생명 주기가 길어질수록 이점이 더 커집니다.
+
+
+<br>
+<br>
+
 
 ## 게시글 API 명세서
 |HTTP Method|URL Path|Status Code|Description|
