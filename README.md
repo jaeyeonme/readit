@@ -18,7 +18,7 @@
 
 ## ✏ Project Structure
 <p align="left">
-  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235721443-4edbcf0f-a58d-4404-bc46-30752f7adb38.png" width="50%"/></div>
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235721443-4edbcf0f-a58d-4404-bc46-30752f7adb38.png" width="60%"/></div>
   <br>  
 </p>
 
@@ -28,7 +28,7 @@
 
 ## ✏ Architecture
 <p align="left">
-  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235740199-636ddcf7-0e5f-4155-a6da-82108f5c0d40.png" width="50%"/></div>
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235740199-636ddcf7-0e5f-4155-a6da-82108f5c0d40.png" width="60%"/></div>
   <br>  
 </p>
 
