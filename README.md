@@ -1,8 +1,30 @@
-  <div align="center"><https://user-images.githubusercontent.com/59726665/235715793-e41a73a5-46c2-48aa-b438-f4c6fe1edfa3.png" width="20%"/></div>
+<p align="center"><img src="https://github.com/jaeyeonme/simple-blog/blob/main/picture/Reddit.png?raw=true" width="30%"></p>
+
+<div align = "center" > 
+  <b> "레딧 스타일의 창의적 커뮤니티 플랫폼" </b>
+  <p/>
+  <p> 사용자들이 다양한 주제와 관심사를 공유하며, 서로 의견을 교환할 수 있는 블로그 서비스를 제공합니다. </p>
+</div>
+
+<br>
+<br>
+
+## ✏ 무엇을 경험하려고 하는건가요? 
+- 테스트 코드 작성과 테스트 커버리지를 높이기 위한 방법들을 적용하기 위해 노력했습니다.
+- 코드의 재사용성, 확장성 및 유지 보수성 향상을 위해 OOP원칙을 적용하려고 노력했습니다.
+
+<br>
+<br>
+
+## ✏ Architecture
+<p align="left">
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/235721443-4edbcf0f-a58d-4404-bc46-30752f7adb38.png" width="70%"/></div>
   <br>  
 </p>
 
-<p align="center"><b>"레딧 스타일의 창의적 커뮤니티 플랫폼"</b><br> <span>사용자들이 다양한 주제와 관심사를 공유하며, 서로 의견을 교환할 수 있는 블로그 서비스를 제공합니다.</p>
+
+<br>
+<br>
 
 
 ## 게시글 API 명세서
