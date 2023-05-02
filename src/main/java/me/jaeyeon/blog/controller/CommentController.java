@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import lombok.RequiredArgsConstructor;
-import me.jaeyeon.blog.config.SessionConst;
+import me.jaeyeon.blog.annotation.AuthenticationRequired;
+import me.jaeyeon.blog.annotation.CurrentMember;
 import me.jaeyeon.blog.dto.CommentReq;
 import me.jaeyeon.blog.dto.CommentRes;
+import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.service.CommentService;
 
 @RestController
@@ -32,18 +33,18 @@ public class CommentController {
     private final CommentService commentService;
 
 	@PostMapping
+	@AuthenticationRequired
 	public ResponseEntity<Void> createComment(@RequestBody @Valid CommentReq commentReq,
-		@PathVariable Long postId,
-		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-		commentService.createComment(commentReq, memberId, postId);
+		@PathVariable Long postId, @CurrentMember Member member) {
+		commentService.createComment(commentReq, postId, member);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@PostMapping("/{commentId}")
+	@AuthenticationRequired
 	public ResponseEntity<Void> createReplyComment(@RequestBody @Valid CommentReq commentReq,
-		@PathVariable Long postId, @PathVariable Long commentId,
-		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-		commentService.saveReplyComment(commentId, commentReq, memberId, postId);
+		@PathVariable Long postId, @PathVariable Long commentId, @CurrentMember Member member) {
+		commentService.saveReplyComment(commentId, commentReq, member, postId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
@@ -61,17 +62,17 @@ public class CommentController {
 	}
 
 	@PutMapping("/{commentId}")
+	@AuthenticationRequired
 	public ResponseEntity<Void> updateComment(@PathVariable Long commentId,
-		@Valid @RequestBody CommentReq commentReq,
-		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-		commentService.updateComment(commentId, commentReq, memberId);
+		@Valid @RequestBody CommentReq commentReq, @CurrentMember Member member) {
+		commentService.updateComment(commentId, commentReq, member);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{commentId}")
-	public ResponseEntity<Void> deleteComment(@PathVariable Long commentId,
-		@SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-		commentService.deleteComment(commentId, memberId);
+	@AuthenticationRequired
+	public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @CurrentMember Member member) {
+		commentService.deleteComment(commentId, member);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

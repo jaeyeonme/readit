@@ -13,7 +13,6 @@ import me.jaeyeon.blog.exception.BlogApiException;
 import me.jaeyeon.blog.exception.ErrorCode;
 import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.model.Post;
-import me.jaeyeon.blog.repository.MemberRepository;
 import me.jaeyeon.blog.repository.PostRepository;
 
 @Slf4j
@@ -23,24 +22,12 @@ import me.jaeyeon.blog.repository.PostRepository;
 public class BlogPostService implements PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
-    private final LoginService loginService;
 
     @Override
-    public void createPost(PostReq postReq, Long memberId) {
-        Member author = memberRepository.findById(memberId)
-            .orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
-        Post post = postReq.toEntity(author);
+    public void createPost(PostReq postReq, Member member) {
+        Post post = postReq.toEntity(member);
         postRepository.save(post);
         log.info("Post created with id: {}", post.getId());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<PostResponse> getAllPosts(Pageable pageable) {
-        Page<PostResponse> result = postRepository.findAll(pageable).map(PostResponse::new);
-        log.info("Retrieved {} posts", result.getNumberOfElements());
-        return result;
     }
 
     @Override
@@ -61,36 +48,38 @@ public class BlogPostService implements PostService {
     }
 
     @Override
-    public void updatePost(PostReq postReq, Long id, Long memberId) {
+    public void updatePost(PostReq postReq, Long id, Member member) {
         Post post = getPost(id);
-        checkWhetherAuthor(post);
+        checkWhetherAuthor(post, member);
         post.update(postReq.getTitle(), postReq.getContent());
         log.info("Post updated with id: {}", id);
     }
 
     @Override
-    public void deletePostById(Long id, Long memberId) {
+    public void deletePostById(Long id, Member member) {
         Post post = getPost(id);
-        checkWhetherAuthor(post);
+        checkWhetherAuthor(post, member);
         postRepository.delete(post);
         log.info("Post deleted with id: {}", id);
     }
 
+
     @Override
+    @Transactional(readOnly = true)
     public Post findPostById(Long postId) {
         return getPost(postId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Post getPost(Long id) {
         return postRepository.findById(id).orElseThrow(
             () -> new BlogApiException(ErrorCode.POST_NOT_FOUND));
     }
 
     @Override
-    public void checkWhetherAuthor(Post post) {
-        Member loggedInMember = loginService.getLoginMember();
-        if (!post.getAuthor().equals(loggedInMember)) {
+    public void checkWhetherAuthor(Post post, Member member) {
+        if (!post.getAuthor().equals(member)) {
             throw new BlogApiException(ErrorCode.IS_NOT_OWNER);
         }
     }

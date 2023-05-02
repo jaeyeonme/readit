@@ -28,10 +28,10 @@ import me.jaeyeon.blog.model.Post;
 import me.jaeyeon.blog.repository.CommentRepository;
 
 @ExtendWith(MockitoExtension.class)
-class CommentServiceTest {
+class BlogCommentServiceTest {
 
 	@InjectMocks
-	private CommentService commentService;
+	private BlogCommentService commentService;
 
 	@Mock
 	private CommentRepository commentRepository;
@@ -64,39 +64,36 @@ class CommentServiceTest {
 
 		testComment = Comment.builder()
 			.content("Test Comment")
-			.member(testMember)
+			.author(testMember)
 			.post(testPost)
 			.build();
 		testComment.setId(1L);
 
 		testReplyComment = Comment.builder()
 			.content("Test Reply Comment")
-			.member(testMember)
+			.author(testMember)
 			.post(testPost)
 			.parent(testComment)
 			.build();
-
 	}
 
 	@Test
 	@DisplayName("댓글 생성 테스트")
 	void createCommentTest() throws Exception {
-	    // given
+		// given
 		CommentReq commentReq = new CommentReq("Test Comment");
 
-		when(memberService.getMember(1L)).thenReturn(testMember);
-		when(postService.findPostById(1L)).thenReturn(testPost);
+		when(postService.findPostById(testPost.getId())).thenReturn(testPost);
 
 		Comment comment = commentReq.toEntity(testMember, testPost);
 		when(commentRepository.save(any(Comment.class))).thenReturn(comment);
 
 		// when
-		Long commentId = commentService.createComment(commentReq, 1L, 1L);
+		Long commentId = commentService.createComment(commentReq, testPost.getId(), testMember);
 
 		// then
 		assertEquals(comment.getId(), commentId);
-		verify(memberService, times(1)).getMember(1L);
-		verify(postService, times(1)).findPostById(1L);
+		verify(postService, times(1)).findPostById(testPost.getId());
 		verify(commentRepository, times(1)).save(any(Comment.class));
 	}
 
@@ -106,7 +103,6 @@ class CommentServiceTest {
 	    // given
 		CommentReq replyCommentReq = new CommentReq("Test Reply Comment");
 
-		when(memberService.getMember(1L)).thenReturn(testMember);
 		when(postService.findPostById(1L)).thenReturn(testPost);
 		when(commentRepository.findById(eq(testComment.getId()))).thenReturn(ofNullable(testComment));
 
@@ -114,11 +110,10 @@ class CommentServiceTest {
 		when(commentRepository.save(any(Comment.class))).thenReturn(replyComment);
 
 		// when
-		Long replyCommentId = commentService.saveReplyComment(testComment.getId(), replyCommentReq, 1L, 1L);
+		Long replyCommentId = commentService.saveReplyComment(testComment.getId(), replyCommentReq, testMember, 1L);
 
 		// then
 		assertEquals(replyComment.getId(), replyCommentId);
-		verify(memberService, times(1)).getMember(1L);
 		verify(postService, times(1)).findPostById(1L);
 		verify(commentRepository, times(1)).findById(any(Long.class));
 		verify(commentRepository, times(1)).save(any(Comment.class));
@@ -165,12 +160,13 @@ class CommentServiceTest {
 		when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
 
 		// when
-		commentService.updateComment(1L, updateCommentReq, testMember.getId());
+		commentService.updateComment(1L, updateCommentReq, testMember);
 
 		// then
 		assertEquals(updateCommentReq.getContent(), testComment.getContent());
 		verify(commentRepository, times(1)).findById(1L);
 	}
+
 
 	@Test
 	@DisplayName("댓글 삭제 테스트")
@@ -179,7 +175,7 @@ class CommentServiceTest {
 		when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
 
 	    // when
-		commentService.deleteComment(1L, testMember.getId());
+		commentService.deleteComment(1L, testMember);
 
 	    // then
 		verify(commentRepository, times(1)).findById(1L);

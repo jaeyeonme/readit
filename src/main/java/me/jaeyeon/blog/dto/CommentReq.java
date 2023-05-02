@@ -23,7 +23,7 @@ public class CommentReq {
 
     public Comment toEntity(Member member, Post post, Comment parent) {
         return Comment.builder()
-            .member(member)
+            .author(member)
             .post(post)
             .content(content)
             .parent(parent)

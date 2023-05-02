@@ -17,7 +17,7 @@ import me.jaeyeon.blog.config.BaseTimeEntity;
 @Entity
 @Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(of = "id", callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 

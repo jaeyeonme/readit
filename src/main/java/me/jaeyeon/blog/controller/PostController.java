@@ -23,26 +23,26 @@ import me.jaeyeon.blog.annotation.AuthenticationRequired;
 import me.jaeyeon.blog.annotation.CurrentMember;
 import me.jaeyeon.blog.dto.PostReq;
 import me.jaeyeon.blog.dto.PostResponse;
-import me.jaeyeon.blog.service.BlogPostService;
+import me.jaeyeon.blog.model.Member;
+import me.jaeyeon.blog.service.PostService;
 
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 
-    private final BlogPostService postService;
+    private final PostService postService;
 
-    @AuthenticationRequired
     @PostMapping
-    public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq,
-        @CurrentMember Long memberId) {
-        postService.createPost(postReq, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> createPost(@RequestBody @Valid PostReq postReq, @CurrentMember Member member) {
+        postService.createPost(postReq, member);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getPostsWithKeyword(
-        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+        @RequestParam(value = "keyword", defaultValue = "", required = false) String keyword,
         @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return new ResponseEntity<>(postService.searchPostsWithKeyword(keyword, pageable), HttpStatus.OK);
     }
@@ -53,18 +53,18 @@ public class PostController {
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
-    @AuthenticationRequired
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq,
-        @PathVariable("id") Long id, @CurrentMember Long memberId) {
-        postService.updatePost(postReq, id, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> updatePost(@RequestBody @Valid PostReq postReq, @PathVariable("id") Long id,
+        @CurrentMember Member member) {
+        postService.updatePost(postReq, id, member);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @AuthenticationRequired
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id, @CurrentMember Long memberId) {
-        postService.deletePostById(id, memberId);
+    @AuthenticationRequired
+    public ResponseEntity<Void> deletePost(@PathVariable("id") Long id, @CurrentMember Member member) {
+        postService.deletePostById(id, member);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

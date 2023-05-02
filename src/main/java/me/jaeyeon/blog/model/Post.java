@@ -25,7 +25,7 @@ import me.jaeyeon.blog.config.BaseTimeEntity;
 @Entity
 @Getter
 @ToString(exclude = {"comments"}, callSuper = true)
-@EqualsAndHashCode(of = "id", callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity {
 
