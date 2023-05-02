@@ -1,3 +1,11 @@
+  <div align="center"><https://user-images.githubusercontent.com/59726665/235715292-e6b02c1c-60fe-44a4-852e-31a475a5296d.png" width="20%"/></div>
+  <br>  
+</p>
+
+<p align="center"><b>"레딧 스타일의 창의적 커뮤니티 플랫폼"</b><br> <span>사용자들이 다양한 주제와 관심사를 공유하며, 서로 의견을 교환할 수 있는 블로그 서비스를 제공합니다.</p>
+
+
+
 ## 게시글 API 명세서
 |HTTP Method|URL Path|Status Code|Description|
 |:-----:|:-----:|:-----:|:-----:|
