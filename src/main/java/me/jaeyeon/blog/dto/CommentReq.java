@@ -1,7 +1,6 @@
 package me.jaeyeon.blog.dto;
 
-import javax.validation.constraints.NotBlank;
-
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,19 +13,14 @@ import me.jaeyeon.blog.model.Post;
 @AllArgsConstructor
 public class CommentReq {
 
-    @NotBlank(message = "댓글 내용을 입력해주세요.")
-    private String content;
+	@NotBlank(message = "댓글 내용을 입력해주세요.")
+	private String content;
 
-    public Comment toEntity(Member member, Post post) {
-        return toEntity(member, post, null);
-    }
+	public Comment toEntity(Member member, Post post) {
+		return toEntity(member, post, null);
+	}
 
-    public Comment toEntity(Member member, Post post, Comment parent) {
-        return Comment.builder()
-            .author(member)
-            .post(post)
-            .content(content)
-            .parent(parent)
-            .build();
-    }
+	public Comment toEntity(Member member, Post post, Comment parent) {
+		return Comment.builder().author(member).post(post).content(content).parent(parent).build();
+	}
 }

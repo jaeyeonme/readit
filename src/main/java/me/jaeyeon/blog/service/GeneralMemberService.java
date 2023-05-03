@@ -34,15 +34,13 @@ public class GeneralMemberService implements MemberService {
 	@Override
 	@Transactional(readOnly = true)
 	public Member findByEmail(String email) {
-		return memberRepository.findByEmail(email)
-			.orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+		return memberRepository.findByEmail(email).orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Member getMember(Long memberId) {
-		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+		return memberRepository.findById(memberId).orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override

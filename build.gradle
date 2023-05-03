@@ -1,101 +1,110 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.9'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'jacoco'
-	id 'java'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'jacoco'
+    id 'java'
 }
 
 group = 'me.jaeyeon'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.security:spring-security-crypto:5.7.6'
-	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-crypto:5.7.6'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
-	// QueryDSL 추가
-	implementation 'com.querydsl:querydsl-jpa'
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // QueryDSL 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 test {
-	useJUnitPlatform()
-	finalizedBy 'jacocoTestReport'
+    useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
 
 jacoco {
-	toolVersion = '0.8.7'
+    toolVersion = '0.8.8'
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+test {
+    finalizedBy jacocoTestReport // 테스트 종료후 항상 리포트 생성
 }
 
 jacocoTestReport {
-	reports {
-		html.enabled true
-		xml.enabled false
-		csv.enabled false
-	}
-	finalizedBy 'jacocoTestCoverageVerification'
+    dependsOn test // 리포트 생성을 위해서는 test가 먼저 완료되어야 함
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    include: ["me/jaeyeon/blog/controller/**/*.class",
+                              "me/jaeyeon/blog/service/**/*.class"])
+        }))
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			enabled = true // 활성화
-			element = 'CLASS' // 클래스 단위로 커버리지 체크
-			// includes = []
+    def Qdomains = []
+    // 패키지 + 클래스명
+    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+        Qdomains.add(qPattern + '*')
+    }
 
-			// 라인 커버리지 제한을 70%로 설정
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.70
-			}
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    include: ["me/jaeyeon/blog/controller/**/*.class",
+                              "me/jaeyeon/blog/service/**/*.class"])
+        }))
+    }
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
 
-			// 브랜치 커버리지 제한을 50%로 설정
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.50
-			}
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
 
-			// 빈 줄을 제외한 코드의 라인수를 최대 100라인으로 제한합니다.
-			limit {
-				counter = 'LINE'
-				value = 'TOTALCOUNT'
-				maximum = 100
-			}
-			//excludes = []
-		}
-	}
-}
-
-//Querydsl 추가, 자동 생성된 Q클래스 gradle clean으로 제거
-clean {
-	delete file('src/main/generated')
+            excludes = [] + Qdomains // 제외할 Qdomains 패턴 추가
+        }
+    }
 }

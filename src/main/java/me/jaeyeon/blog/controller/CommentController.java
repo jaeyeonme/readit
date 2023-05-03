@@ -1,7 +1,5 @@
 package me.jaeyeon.blog.controller;
 
-import javax.validation.Valid;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.annotation.AuthenticationRequired;
 import me.jaeyeon.blog.annotation.CurrentMember;
@@ -30,27 +29,27 @@ import me.jaeyeon.blog.service.CommentService;
 @RequestMapping("/api/posts/{postId}/comments")
 public class CommentController {
 
-    private final CommentService commentService;
+	private final CommentService commentService;
 
 	@PostMapping
 	@AuthenticationRequired
-	public ResponseEntity<Void> createComment(@RequestBody @Valid CommentReq commentReq,
-		@PathVariable Long postId, @CurrentMember Member member) {
+	public ResponseEntity<Void> createComment(@RequestBody @Valid CommentReq commentReq, @PathVariable Long postId,
+			@CurrentMember Member member) {
 		commentService.createComment(commentReq, postId, member);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@PostMapping("/{commentId}")
 	@AuthenticationRequired
-	public ResponseEntity<Void> createReplyComment(@RequestBody @Valid CommentReq commentReq,
-		@PathVariable Long postId, @PathVariable Long commentId, @CurrentMember Member member) {
+	public ResponseEntity<Void> createReplyComment(@RequestBody @Valid CommentReq commentReq, @PathVariable Long postId,
+			@PathVariable Long commentId, @CurrentMember Member member) {
 		commentService.saveReplyComment(commentId, commentReq, member, postId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@GetMapping
 	public ResponseEntity<Page<CommentRes>> getAllComment(@PathVariable Long postId,
-		@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+			@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
 		Page<CommentRes> comments = commentService.getCommentsByPostId(postId, pageable);
 		return new ResponseEntity<>(comments, HttpStatus.OK);
 	}
@@ -63,8 +62,8 @@ public class CommentController {
 
 	@PutMapping("/{commentId}")
 	@AuthenticationRequired
-	public ResponseEntity<Void> updateComment(@PathVariable Long commentId,
-		@Valid @RequestBody CommentReq commentReq, @CurrentMember Member member) {
+	public ResponseEntity<Void> updateComment(@PathVariable Long commentId, @Valid @RequestBody CommentReq commentReq,
+			@CurrentMember Member member) {
 		commentService.updateComment(commentId, commentReq, member);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
