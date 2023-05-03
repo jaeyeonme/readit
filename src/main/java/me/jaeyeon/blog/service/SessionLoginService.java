@@ -28,12 +28,12 @@ public class SessionLoginService implements LoginService {
 
 	@Override
 	public Member getLoginMember() {
-		Long memberId = (Long) httpSession.getAttribute(MEMBER_ID);
+		Long memberId = (Long)httpSession.getAttribute(MEMBER_ID);
 		return memberService.getMember(memberId);
 	}
 
 	@Override
 	public Long getLoginMemberId() {
-		return (Long) httpSession.getAttribute(MEMBER_ID);
+		return (Long)httpSession.getAttribute(MEMBER_ID);
 	}
 }

@@ -8,5 +8,5 @@ import me.jaeyeon.blog.model.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Page<Comment> findAllByPost_Id(Long postId, Pageable pageable);
+	Page<Comment> findAllByPost_Id(Long postId, Pageable pageable);
 }

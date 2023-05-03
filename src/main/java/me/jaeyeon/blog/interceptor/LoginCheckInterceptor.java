@@ -19,9 +19,10 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	private final LoginService loginService;
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws
+			Exception {
 		if (handler instanceof HandlerMethod) {
-			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			HandlerMethod handlerMethod = (HandlerMethod)handler;
 			if (handlerMethod.hasMethodAnnotation(AuthenticationRequired.class)) {
 				Long memberId = loginService.getLoginMemberId();
 				if (memberId == null) {

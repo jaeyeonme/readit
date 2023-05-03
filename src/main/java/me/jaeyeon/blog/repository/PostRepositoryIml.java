@@ -23,20 +23,18 @@ public class PostRepositoryIml implements PostRepositoryCustom {
 	@Override
 	public Page<Post> findByTitleContainingOrContentContaining(String keyword, Pageable pageable) {
 		List<Post> posts = queryFactory.selectFrom(post)
-			.where(matchAgainstTitleAndContent(keyword).gt(0))
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
-			.fetch();
+				.where(matchAgainstTitleAndContent(keyword).gt(0))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.fetch();
 
-		long total = queryFactory.selectFrom(post)
-			.where(matchAgainstTitleAndContent(keyword).gt(0))
-			.fetch().size();
+		long total = queryFactory.selectFrom(post).where(matchAgainstTitleAndContent(keyword).gt(0)).fetch().size();
 
 		return new PageImpl<>(posts, pageable, total);
 	}
 
 	private NumberExpression<Double> matchAgainstTitleAndContent(String keyword) {
-		return Expressions.numberTemplate(Double.class, "function('match_against', {0}, {1}, {2})",
-			post.title, post.content, keyword);
+		return Expressions.numberTemplate(Double.class, "function('match_against', {0}, {1}, {2})", post.title,
+				post.content, keyword);
 	}
 }

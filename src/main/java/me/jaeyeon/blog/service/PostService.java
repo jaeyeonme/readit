@@ -11,11 +11,18 @@ import me.jaeyeon.blog.model.Post;
 public interface PostService {
 
 	void createPost(PostReq postReq, Member member);
+
 	Page<PostResponse> searchPostsWithKeyword(String keyword, Pageable pageable);
+
 	PostResponse getPostById(Long id);
+
 	void updatePost(PostReq postReq, Long id, Member member);
+
 	void deletePostById(Long id, Member member);
+
 	Post findPostById(Long postId);
+
 	Post getPost(Long id);
+
 	void checkWhetherAuthor(Post post, Member member);
 }
