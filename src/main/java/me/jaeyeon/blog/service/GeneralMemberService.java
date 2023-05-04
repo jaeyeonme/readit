@@ -39,8 +39,15 @@ public class GeneralMemberService implements MemberService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Member getMember(Long memberId) {
+	public Member findById(Long memberId) {
 		return memberRepository.findById(memberId).orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public Member signIn(String email, String password) {
+		Member member = findByEmail(email);
+		checkPassword(password, member);
+		return member;
 	}
 
 	@Override

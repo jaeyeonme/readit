@@ -8,7 +8,9 @@ public interface MemberService {
 
 	Member findByEmail(String email);
 
-	Member getMember(Long memberId);
+	Member findById(Long memberId);
+
+	Member signIn(String email, String password);
 
 	void validateDuplicate(String email);
 

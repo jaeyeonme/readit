@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
 import me.jaeyeon.blog.dto.MemberSignIn;
+import me.jaeyeon.blog.model.Member;
 import me.jaeyeon.blog.service.LoginService;
 import me.jaeyeon.blog.service.MemberService;
 
@@ -30,10 +31,8 @@ public class MemberController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<Void> signIn(@RequestBody @Valid MemberSignIn signIn) {
-		String email = signIn.getEmail();
-		String password = signIn.getPassword();
-
-		loginService.login(email, password);
+		Member member = memberService.signIn(signIn.getEmail(), signIn.getPassword());
+		loginService.login(member.getId());
 
 		return ResponseEntity.ok().build();
 	}
