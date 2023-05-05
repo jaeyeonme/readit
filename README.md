@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/jaeyeonme/simple-blog/blob/main/picture/Reddit.png?raw=true" width="30%"></p>
+<p align="center"><img src="https://github.com/jaeyeonme/simple-blog/blob/main/picture/Reddit-removebg.png?raw=true" width="30%"></p>
 
 <div align = "center" > 
   <b> "레딧 스타일의 창의적 커뮤니티 플랫폼" </b>
