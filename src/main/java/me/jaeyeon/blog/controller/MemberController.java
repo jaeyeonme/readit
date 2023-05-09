@@ -31,7 +31,7 @@ public class MemberController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<Void> signIn(@RequestBody @Valid MemberSignIn signIn) {
-		Member member = memberService.signIn(signIn.getEmail(), signIn.getPassword());
+		Member member = memberService.signIn(signIn);
 		loginService.login(member.getId());
 
 		return ResponseEntity.ok().build();

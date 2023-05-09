@@ -22,6 +22,7 @@ import me.jaeyeon.blog.repository.PostRepository;
 public class BlogPostService implements PostService {
 
 	private final PostRepository postRepository;
+	private final LoginService loginService;
 
 	@Override
 	public void createPost(PostReq postReq, Member member) {
@@ -49,7 +50,7 @@ public class BlogPostService implements PostService {
 	@Override
 	public void updatePost(PostReq postReq, Long id, Member member) {
 		Post post = getPost(id);
-		checkWhetherAuthor(post, member);
+		checkWhetherAuthor(post);
 		post.update(postReq.getTitle(), postReq.getContent());
 		log.info("Post updated with id: {}", id);
 	}
@@ -57,7 +58,7 @@ public class BlogPostService implements PostService {
 	@Override
 	public void deletePostById(Long id, Member member) {
 		Post post = getPost(id);
-		checkWhetherAuthor(post, member);
+		checkWhetherAuthor(post);
 		postRepository.delete(post);
 		log.info("Post deleted with id: {}", id);
 	}
@@ -75,8 +76,10 @@ public class BlogPostService implements PostService {
 	}
 
 	@Override
-	public void checkWhetherAuthor(Post post, Member member) {
-		if (!post.getAuthor().equals(member)) {
+	@Transactional(readOnly = true)
+	public void checkWhetherAuthor(Post post) {
+		Member loginMember = loginService.getLoginMember();
+		if (!post.getAuthor().equals(loginMember)) {
 			throw new BlogApiException(ErrorCode.IS_NOT_OWNER);
 		}
 	}

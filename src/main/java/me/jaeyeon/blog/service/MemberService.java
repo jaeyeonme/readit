@@ -1,6 +1,7 @@
 package me.jaeyeon.blog.service;
 
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
+import me.jaeyeon.blog.dto.MemberSignIn;
 import me.jaeyeon.blog.model.Member;
 
 public interface MemberService {
@@ -10,7 +11,7 @@ public interface MemberService {
 
 	Member findById(Long memberId);
 
-	Member signIn(String email, String password);
+	Member signIn(MemberSignIn signIn);
 
 	void validateDuplicate(String email);
 

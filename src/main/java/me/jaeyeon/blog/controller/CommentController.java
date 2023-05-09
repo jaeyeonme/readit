@@ -43,7 +43,7 @@ public class CommentController {
 	@AuthenticationRequired
 	public ResponseEntity<Void> createReplyComment(@RequestBody @Valid CommentReq commentReq, @PathVariable Long postId,
 			@PathVariable Long commentId, @CurrentMember Member member) {
-		commentService.saveReplyComment(commentId, commentReq, member, postId);
+		commentService.saveReplyComment(commentId, commentReq, postId, member);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 

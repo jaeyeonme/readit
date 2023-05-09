@@ -24,5 +24,5 @@ public interface PostService {
 
 	Post getPost(Long id);
 
-	void checkWhetherAuthor(Post post, Member member);
+	void checkWhetherAuthor(Post post);
 }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jaeyeon.blog.dto.MemberRegistrationReq;
+import me.jaeyeon.blog.dto.MemberSignIn;
 import me.jaeyeon.blog.exception.BlogApiException;
 import me.jaeyeon.blog.exception.EmailAlreadyExistsException;
 import me.jaeyeon.blog.exception.ErrorCode;
@@ -44,9 +45,9 @@ public class GeneralMemberService implements MemberService {
 	}
 
 	@Override
-	public Member signIn(String email, String password) {
-		Member member = findByEmail(email);
-		checkPassword(password, member);
+	public Member signIn(MemberSignIn signIn) {
+		Member member = findByEmail(signIn.getEmail());
+		checkPassword(signIn.getPassword(), member);
 		return member;
 	}
 
