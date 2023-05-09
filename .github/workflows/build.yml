@@ -90,6 +90,7 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "reddit-blog"
           heroku_email: "cjyeon1022@gmail.com"
+          dontuseforce: true
           usedocker: true
           appdir: "ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}"
         env:
