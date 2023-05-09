@@ -92,4 +92,10 @@ jobs:
           heroku_email: "cjyeon1022@gmail.com"
           usedocker: true
           appdir: "ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}"
+        env:
+          GIT_COMMITTER_NAME: ${{ github.actor }}
+          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+          GIT_AUTHOR_NAME: ${{ github.actor }}
+          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
+
 
