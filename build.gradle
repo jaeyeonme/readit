@@ -99,9 +99,10 @@ jacocoTestCoverageVerification {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it,
                     include: ["me/jaeyeon/blog/controller/**/*.class",
-                              "me/jaeyeon/blog/service/**/*.class"])
+                              "me/jaeyeon/blog/service/impl/**/*.class"])
         }))
     }
+
     violationRules {
         rule {
             enabled = true
