@@ -74,7 +74,14 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: build
+          arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.REGISTRY }}
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.13
@@ -82,3 +89,5 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "reddit-blog"
           heroku_email: "cjyeon1022@gmail.com"
+          usedocker: true
+          appdir: "ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}"
