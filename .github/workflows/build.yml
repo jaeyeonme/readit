@@ -71,17 +71,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }} --stacktrace
-
+      # 이 부분을 위로 이동
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.REGISTRY }}
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.13
@@ -91,3 +92,4 @@ jobs:
           heroku_email: "cjyeon1022@gmail.com"
           usedocker: true
           appdir: "ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}"
+
