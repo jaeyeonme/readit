@@ -81,7 +81,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.REGISTRY }}
+          password: ${{ secrets.GITHUB_REGISTRY }}
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.13
