@@ -8,6 +8,7 @@ spring:
     password: ""
     driver-class-name: org.h2.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
     properties:
@@ -19,6 +20,11 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+logging:
+  level:
+    org.springframework.core:
+      LocalVariableTableParameterNameDiscoverer: ERROR
 ---
 spring:
   config:
@@ -32,18 +38,19 @@ spring:
 
   # JPA
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
 ---
 spring:
   config:
     activate:
-      on-profile: heroku
+      on-profile: prod
   datasource:
     url: "jdbc:mysql://x8autxobia7sgh74.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/pjanxnyvqpr6fbee"
     username: ${HEROKU_DATABASE_NAME}
@@ -52,10 +59,16 @@ spring:
 
   # JPA
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
+
+logging:
+  level:
+    org.springframework.core:
+      LocalVariableTableParameterNameDiscoverer: ERROR

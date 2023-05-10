@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ "main", "dev" ]
     paths:
-      - 'src/**'
+      - "src/**"
   push:
     branches:
       - main
@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Setting Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Checkstyle
         uses: dbelyaev/action-checkstyle@v0.7.5
@@ -30,13 +30,13 @@ jobs:
 
     steps:
       - name: Setting Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
@@ -44,7 +44,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles("**/*.gradle*", "**/gradle-wrapper.properties") }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -68,10 +68,9 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
-      # 이 부분을 위로 이동
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -84,15 +83,17 @@ jobs:
         with:
           arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
 
+      - name: Login to Heroku
+        run: heroku login -i <<< "${{ secrets.HEROKU_API_KEY }}"
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
       - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.13
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: reddit-blog
-          heroku_email: cjyeon1022@gmail.com
-          usedocker: true
-          appdir: ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
-          docker_heroku_process_type: web
+        run: heroku container:push web --app reddit-blog --context-path .
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
-
-
+      - name: Release to Heroku
+        run: heroku container:release web --app reddit-blog
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
