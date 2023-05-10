@@ -83,6 +83,9 @@ jobs:
         with:
           arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
 
+      - name: Pull image from GitHub Container Registry
+        run: docker pull ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
+
       - name: Login to Heroku
         run: heroku container:login
         env:
@@ -97,3 +100,4 @@ jobs:
         run: heroku container:release web --app reddit-blog
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
