@@ -88,6 +88,9 @@ jobs:
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "reddit-blog"
-          heroku_email: "<your-email>"
+          heroku_email: "cjyeon1022@gmail.com"
           usedocker: true
-          dockerimages: "ghcr.io/${{ github.repository_owner }}/simple-blog:${{ github.sha }}"
+          image: ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
+          branch: HEAD
+          process_type: web
+
