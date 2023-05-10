@@ -84,7 +84,7 @@ jobs:
           arguments: jib --image=ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
 
       - name: Login to Heroku
-        run: heroku login -i <<< "${{ secrets.HEROKU_API_KEY }}"
+        run: heroku container:login
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
