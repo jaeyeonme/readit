@@ -85,6 +85,8 @@ jobs:
 
       - name: Pull image from GitHub Container Registry
         run: docker pull ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Login to Heroku
         run: heroku container:login
@@ -92,7 +94,7 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Deploy to Heroku
-        run: heroku container:push web --app reddit-blog --context-path .
+        run: heroku container:push web --app reddit-blog --context-path . --image ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
@@ -100,4 +102,3 @@ jobs:
         run: heroku container:release web --app reddit-blog
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-
