@@ -18,7 +18,7 @@
 
 ## ✏ Project Structure
 <p align="left">
-  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/237741033-8f432a8c-2757-4be6-9770-cf5fa3ab4731.png" width="75%"/></div>
+  <div align="left"><img src="https://user-images.githubusercontent.com/59726665/237743026-30a3a956-916b-48b1-8d2f-705d04c5f92a.png" width="75%"/></div>
   <br>  
 </p>
 
