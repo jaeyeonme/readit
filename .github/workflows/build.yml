@@ -100,6 +100,6 @@ jobs:
         run: |
           aws s3 cp \
           --region ap-northeast-2 \
-          ./build/libs/*.jar s3://readit-bucket-deploy
+          ./build/libs/*.jar s3://redit-bucket-deploy
 
       # Add your AWS CodeDeploy steps here if you need
