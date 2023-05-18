@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: CI/CD Pipeline
 
 on:
   pull_request:
@@ -9,37 +9,27 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  S3_BUCKET_NAME: "redit-blog-bucket"
+  PROJECT_NAME: "simple-blog"
+  JAVA_VERSION: "17"
+
 jobs:
-  checkstyle:
+  build_and_test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Setting Checkout
         uses: actions/checkout@v2
 
-      - name: Checkstyle
-        uses: dbelyaev/action-checkstyle@v0.7.5
-        with:
-          checkstyle_config: ${{ github.workspace }}/config/checkstyle/naver-checkstyle-rules.xml
-          github_token: ${{ secrets.github_token }}
-          reporter: github-check
-          level: warning
-
-  build_and_coverage:
-    needs: checkstyle
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Setting Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: "17"
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
 
-      # Add your sensitive file setup here if you need
       - run: touch ./src/main/resources/application-secret.properties
       - run: echo "${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.properties
       - run: cat ./src/main/resources/application-secret.properties
@@ -66,28 +56,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    needs: build_and_coverage
+    needs: build_and_test
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: "17"
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.REGISTRY }}
-
-      - name: Build and Push Docker image
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: jib --image=ghcr.io/${{ github.repository_owner }}/simple-blog:${{ github.sha }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -97,7 +76,4 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Upload Jar to S3
-        run: aws s3 cp ./build/libs/*.jar s3://redit-bucket-deploy
-
-
-      # Add your AWS CodeDeploy steps here if you need
+        run: aws s3 cp ./build/libs/*.jar s3://$S3_BUCKET_NAME/$PROJECT_NAME/
