@@ -26,6 +26,7 @@ jobs:
           level: warning
 
   build_and_coverage:
+    needs: checkstyle
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +38,11 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+
+      # Add your sensitive file setup here if you need
+      - run: touch ./src/main/resources/application-secret.properties
+      - run: echo "${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.properties
+      - run: cat ./src/main/resources/application-secret.properties
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
@@ -83,15 +89,17 @@ jobs:
         with:
           arguments: jib --image=ghcr.io/${{ github.repository_owner }}/simple-blog:${{ github.sha }}
 
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: reddit-blog
-          heroku_email: cjyeon1022@gmail.com
-          usedocker: true
-          dockerimages: ghcr.io/jaeyeonme/simple-blog:${{ github.sha }}
-          branch: HEAD
-          docker_heroku_process_type: web
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
+      - name: Upload Jar to S3
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          ./build/libs/*.jar s3://readit-bucket-deploy
 
+      # Add your AWS CodeDeploy steps here if you need
