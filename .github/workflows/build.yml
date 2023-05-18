@@ -97,6 +97,6 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Upload Jar to S3
-        run: aws s3 cp --region ap-northeast-2 ./simple-blog.zip s3://$S3_BUCKET_NAME/simple-blog.zip
+        run: aws s3 cp --region ap-northeast-2 ./blog.zip s3://$S3_BUCKET_NAME/blog.zip
 
       # Add your AWS CodeDeploy steps here if you need
