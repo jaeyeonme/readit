@@ -56,10 +56,6 @@ jobs:
           format: YYYY-MM-DDTHH-mm-ss
           utcOffset: "+09:00"
 
-      - name: Show Current Time
-        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
-        shell: bash
-
       - name: Make application.yml
         run: |
           cd ./src/main
@@ -69,22 +65,29 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./application.yml
         shell: bash
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Show Current Time
+        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+        shell: bash
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: build
-
-      - name: Add coverage to PR
-        uses: madrapps/jacoco-report@v1.3
-        with:
-          paths: ${{ github.workspace }}/build/customJacocoReportDir/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Make zip file
         run: |
           mkdir deploy
           cp ./build/libs/*.jar ./deploy/
           zip -r -qq -j ./reddit.zip ./deploy
+
+      - name: Add coverage to PR
+        uses: madrapps/jacoco-report@v1.3
+        with:
+          paths: ${{ github.workspace }}/build/customJacocoReportDir/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: build_and_coverage
@@ -106,7 +109,7 @@ jobs:
           password: ${{ secrets.REGISTRY }}
 
       - name: Build and Push Docker image
-        uses: gradle/gradle-build-action@```yaml
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: jib --image=ghcr.io/${{ github.repository_owner }}/simple-blog:${{ github.sha }}
 
@@ -118,4 +121,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Upload Jar to S3
-        run: aws s3 cp ./reddit.zip s3://redddit-bucket
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            ./reddit.zip s3://redddit-bucket
