@@ -11,7 +11,7 @@ import me.jaeyeon.blog.model.Member;
 public interface CommentService {
 	Long createComment(CommentReq commentReq, Long postId, Member member);
 
-	Long saveReplyComment(Long commentId, CommentReq request, Member member, Long postId);
+	Long saveReplyComment(Long commentId, CommentReq request, Long postId, Member member);
 
 	Page<CommentRes> getCommentsByPostId(Long postId, Pageable pageable);
 
@@ -23,5 +23,5 @@ public interface CommentService {
 
 	Comment getComment(Long id);
 
-	void checkWhetherAuthor(Comment comment, Member member);
+	void checkWhetherAuthor(Comment comment);
 }

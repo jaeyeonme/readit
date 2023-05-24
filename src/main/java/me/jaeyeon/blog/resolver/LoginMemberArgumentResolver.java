@@ -18,13 +18,13 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 	private final LoginService loginService;
 
 	@Override
-	public boolean supportsParameter(MethodParameter parameter) {
-		return parameter.hasParameterAnnotation(CurrentMember.class);
+	public boolean supportsParameter(MethodParameter methodParameter) {
+		return methodParameter.hasParameterAnnotation(CurrentMember.class);
 	}
 
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+	public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer,
+			NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
 		return loginService.getLoginMember();
 	}
 }

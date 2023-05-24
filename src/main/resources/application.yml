@@ -8,18 +8,23 @@ spring:
     password: ""
     driver-class-name: org.h2.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-        metadata_builder_contributor: me.jaeyeon.blog.config.SqlFunctionsMetadataBuilderContributor
         dialect: org.hibernate.dialect.H2Dialect
   h2:
     console:
       enabled: true
       path: /h2-console
+
+logging:
+  level:
+    org.springframework.core:
+      LocalVariableTableParameterNameDiscoverer: ERROR
 ---
 spring:
   config:
@@ -33,11 +38,16 @@ spring:
 
   # JPA
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-        metadata_builder_contributor: me.jaeyeon.blog.config.SqlFunctionsMetadataBuilderContributor
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
+
+logging:
+  level:
+    org.springframework.core:
+      LocalVariableTableParameterNameDiscoverer: ERROR

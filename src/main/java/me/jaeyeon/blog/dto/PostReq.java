@@ -22,9 +22,9 @@ public class PostReq {
 
 	public Post toEntity(Member author) {
 		return Post.builder()
-			.title(title)
-			.content(content)
-			.author(author)
-			.build();
+				.title(this.title)
+				.content(this.content)
+				.author(author)
+				.build();
 	}
 }

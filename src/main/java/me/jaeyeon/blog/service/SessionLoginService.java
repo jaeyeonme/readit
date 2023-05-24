@@ -15,10 +15,8 @@ public class SessionLoginService implements LoginService {
 	public static final String MEMBER_ID = "MEMBER_ID";
 
 	@Override
-	public void login(String email, String password) {
-		Member member = memberService.findByEmail(email);
-		memberService.checkPassword(password, member);
-		httpSession.setAttribute(MEMBER_ID, member.getId());
+	public void login(long id) {
+		httpSession.setAttribute(MEMBER_ID, id);
 	}
 
 	@Override
@@ -29,7 +27,7 @@ public class SessionLoginService implements LoginService {
 	@Override
 	public Member getLoginMember() {
 		Long memberId = (Long)httpSession.getAttribute(MEMBER_ID);
-		return memberService.getMember(memberId);
+		return memberService.findById(memberId);
 	}
 
 	@Override

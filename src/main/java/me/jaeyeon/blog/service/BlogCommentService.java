@@ -24,6 +24,7 @@ public class BlogCommentService implements CommentService {
 
 	private final CommentRepository commentRepository;
 	private final PostService postService;
+	private final LoginService loginService;
 
 	@Override
 	public Long createComment(CommentReq commentReq, Long postId, Member member) {
@@ -43,7 +44,7 @@ public class BlogCommentService implements CommentService {
 	}
 
 	@Override
-	public Long saveReplyComment(Long commentId, CommentReq request, Member member, Long postId) {
+	public Long saveReplyComment(Long commentId, CommentReq request, Long postId, Member member) {
 		// 부모 댓글, 게시글 정보를 가져오기
 		Comment parentComment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new BlogApiException(ErrorCode.COMMENT_NOT_FOUND));
@@ -73,7 +74,7 @@ public class BlogCommentService implements CommentService {
 	@Override
 	public void updateComment(Long id, CommentReq commentReq, Member member) {
 		Comment comment = getComment(id);
-		checkWhetherAuthor(comment, member);
+		checkWhetherAuthor(comment);
 		comment.updateComment(commentReq.getContent());
 		log.info("Updated comment with ID: {}", comment.getId());
 	}
@@ -81,7 +82,7 @@ public class BlogCommentService implements CommentService {
 	@Override
 	public void deleteComment(Long id, Member member) {
 		Comment comment = getComment(id);
-		checkWhetherAuthor(comment, member);
+		checkWhetherAuthor(comment);
 		commentRepository.delete(comment);
 		log.info("Deleted comment with ID: {}", comment.getId());
 	}
@@ -94,8 +95,10 @@ public class BlogCommentService implements CommentService {
 	}
 
 	@Override
-	public void checkWhetherAuthor(Comment comment, Member member) {
-		if (!comment.getAuthor().equals(member)) {
+	@Transactional(readOnly = true)
+	public void checkWhetherAuthor(Comment comment) {
+		Member loginMember = loginService.getLoginMember();
+		if (!comment.getAuthor().equals(loginMember)) {
 			throw new BlogApiException(ErrorCode.IS_NOT_OWNER);
 		}
 	}

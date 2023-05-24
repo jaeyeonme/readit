@@ -21,13 +21,12 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws
 			Exception {
-		if (handler instanceof HandlerMethod) {
-			HandlerMethod handlerMethod = (HandlerMethod)handler;
-			if (handlerMethod.hasMethodAnnotation(AuthenticationRequired.class)) {
-				Long memberId = loginService.getLoginMemberId();
-				if (memberId == null) {
-					throw new UnAuthenticatedAccessException(ErrorCode.UNAUTHENTICATED_ACCESS);
-				}
+		if (handler instanceof HandlerMethod && ((HandlerMethod)handler).hasMethodAnnotation(
+				AuthenticationRequired.class)) {
+			Long memberId = loginService.getLoginMemberId();
+
+			if (memberId == null) {
+				throw new UnAuthenticatedAccessException(ErrorCode.UNAUTHENTICATED_ACCESS);
 			}
 		}
 		return true;
