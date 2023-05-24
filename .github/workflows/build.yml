@@ -125,4 +125,5 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./blog.zip s3://redddit-bucket
+            ./deploy/blog.zip s3://redddit-bucket
+
