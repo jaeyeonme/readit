@@ -81,7 +81,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp ./build/libs/*.jar ./deploy/
-          zip -r -qq -j ./deploy/reddit.zip ./deploy
+          zip -r -qq -j ./deploy/blog.zip ./deploy
 
 
       - name: Add coverage to PR
@@ -125,4 +125,4 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./reddit.zip s3://redddit-bucket
+            ./blog.zip s3://redddit-bucket
