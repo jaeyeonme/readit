@@ -77,10 +77,6 @@ jobs:
         with:
           arguments: build
 
-      - name: Build and push Docker image
-        run: |
-          ./gradlew jib --image=ghcr.io/jaeyeonme/readit:${{ steps.current-time.outputs.formattedTime }}
-
       - name: Make zip file
         run: |
           mkdir -p deploy
@@ -107,9 +103,6 @@ jobs:
 
       - name: Download zip file
         uses: actions/download-artifact@v2
-
-      - name: Download zip file
-        uses: actions/download-artifact@v2
         with:
           name: blog-zip
           path: ./deploy
@@ -119,6 +112,10 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+
+      - name: Build and push Docker image
+        run: |
+          ./gradlew jib --image=ghcr.io/jaeyeonme/readit:${{ steps.current-time.outputs.formattedTime }}
 
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
