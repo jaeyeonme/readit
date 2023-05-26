@@ -77,6 +77,10 @@ jobs:
         with:
           arguments: build
 
+      - name: Build and push Docker image
+        run: |
+          ./gradlew jib --image=ghcr.io/jaeyeonme/readit:${{ steps.current-time.outputs.formattedTime }}
+
       - name: Make zip file
         run: |
           mkdir -p deploy
@@ -103,6 +107,9 @@ jobs:
 
       - name: Download zip file
         uses: actions/download-artifact@v2
+
+      - name: Download zip file
+        uses: actions/download-artifact@v2
         with:
           name: blog-zip
           path: ./deploy
@@ -124,4 +131,4 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./deploy/blog.zip s3://redddit-bucket
+            ./deploy/blog.zip s3://reddit-spring
