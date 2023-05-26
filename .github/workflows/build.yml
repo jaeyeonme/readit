@@ -113,6 +113,10 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Build and push Docker image
+        run: |
+          ./gradlew jib --image=ghcr.io/jaeyeonme/readit:${{ steps.current-time.outputs.formattedTime }}
+
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -124,4 +128,4 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./deploy/blog.zip s3://redddit-bucket
+            ./deploy/blog.zip s3://reddit-spring
