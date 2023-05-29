@@ -73,6 +73,12 @@ jobs:
           cp ./build/libs/*.jar ./deploy/
           zip -r -qq -j ./blog.zip ./deploy/
 
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v2
+        with:
+          name: blog.zip
+          path: ./blog.zip
+
       - name: Add coverage to PR
         uses: madrapps/jacoco-report@v1.3
         with:
@@ -90,6 +96,12 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+
+      - name: Download ZIP
+        uses: actions/download-artifact@v2
+        with:
+          name: blog.zip
+          path: ./
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
