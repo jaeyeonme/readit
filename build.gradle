@@ -3,19 +3,11 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.0'
     id 'jacoco'
     id 'java'
-    id 'com.google.cloud.tools.jib' version '3.3.1'
 }
 
 group = 'me.jaeyeon'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
-
-jib {
-    to {
-        image = "ghcr.io/jaeyeonme/readit:${project.version}"
-        tags = ['latest']
-    }
-}
 
 
 configurations {

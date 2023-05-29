@@ -79,7 +79,10 @@ jobs:
 
       - name: Make zip file
         run: |
-          mkdir -p deploy
+          mkdir deploy
+          cp ./appspec.yml ./deploy/
+          cp ./Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
           cp ./build/libs/*.jar ./deploy/
           zip -r -qq -j ./deploy/blog.zip ./deploy
 
@@ -126,3 +129,9 @@ jobs:
           aws s3 cp \
             --region ap-northeast-2 \
             ./deploy/blog.zip s3://reddit-spring
+
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name test-app
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name test-app-group
+          --s3-location bucket=tcat-spring,bundleType=zip,key=blog.zip
