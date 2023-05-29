@@ -134,5 +134,5 @@ jobs:
       - name: Code Deploy
         run: aws deploy create-deployment --application-name test-app
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name test-app-group
+          --deployment-group-name test-app
           --s3-location bucket=tcat-spring,bundleType=zip,key=blog.zip
