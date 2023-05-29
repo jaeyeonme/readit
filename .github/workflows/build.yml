@@ -30,16 +30,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Your previous steps go here.
+      - name: Setting Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make application.yml
+        run: |
+          cd ./src/main
+          mkdir -p resources
+          cd ./resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Make zip file
         run: |
           mkdir deploy
-          cp ./appspec.yml ./deploy/
-          cp ./Dockerfile ./deploy/
-          cp ./*.sh ./deploy/
           cp ./build/libs/*.jar ./deploy/
-          zip -r -qq -j ./deploy/blog.zip ./deploy
+          zip -r -qq -j ./deploy/blog.zip ./deploy/
 
       - name: Add coverage to PR
         uses: madrapps/jacoco-report@v1.3
