@@ -71,7 +71,7 @@ jobs:
           cp ./Dockerfile ./deploy/
           cp ./scripts/*.sh ./deploy/
           cp ./build/libs/*.jar ./deploy/
-          zip -r -qq -j ./deploy/blog.zip ./deploy/
+          zip -r -qq -j ./blog.zip ./deploy/
 
       - name: Add coverage to PR
         uses: madrapps/jacoco-report@v1.3
@@ -117,7 +117,7 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./deploy/blog.zip s3://reddit-spring
+            ./blog.zip s3://reddit-spring
 
       - name: Code Deploy
         run: aws deploy create-deployment --application-name test-app
