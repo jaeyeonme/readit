@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: AWS CI/CD with Spring Boot
 
 on:
   pull_request:
