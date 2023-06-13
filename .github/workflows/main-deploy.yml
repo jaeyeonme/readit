@@ -52,7 +52,7 @@ jobs:
       - name: Make application.yml
         run: |
           cd ./src/main
-          mkdir resources
+          mkdir -p resources
           cd ./resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
