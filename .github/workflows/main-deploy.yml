@@ -1,4 +1,4 @@
-name: CD with Spring Boot
+name: AWS CI/CD with Spring Boot
 
 on:
   pull_request:
@@ -49,11 +49,39 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Make application.yml
+        run: |
+          cd ./src/main
+          mkdir resources
+          cd ./resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+        shell: bash
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Make zip file
+        run: |
+          mkdir deploy
+          cp ./build/libs/*.jar ./deploy/
+          zip -r -qq -j ./reddit.zip ./deploy
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            ./reddit.zip s3://reddit-s3
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
