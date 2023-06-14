@@ -92,7 +92,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/reddit-api-spring-boot-docker:latest
+          tags: ghcr.io/${{ github.repository_owner }}/readit:latest
 
       - name: Upload to S3
         run: |

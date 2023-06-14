@@ -12,6 +12,11 @@ else
   sleep 5
 fi
 
+echo "> Docker image pull from Github Container Registry" >> /home/ec2-user/deploy.log
+sudo docker pull ghcr.io/jaeyeonme/readit:latest
+
+echo "> JAR file download from S3" >> /home/ec2-user/deploy.log
+aws s3 cp s3://reddit-s3/blog-0.0.1-SNAPSHOT.jar /home/ec2-user/app/
+
 cd /home/ec2-user/app
-sudo docker build -t reddit-api-spring-boot-docker .
-sudo docker run -d -p 8080:8080 reddit-api-spring-boot-docker
+sudo docker run -d -p 8080:8080 -v $(pwd):/app ghcr.io/jaeyeonme/readit:latest
