@@ -64,6 +64,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Prepare for Docker build
+        run: |
+          cp ./build/libs/*.jar .
+
       - name: Make zip file
         run: |
           mkdir deploy
