@@ -86,6 +86,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.REGISTRY }}
+          log-level: debug
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
