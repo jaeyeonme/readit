@@ -67,6 +67,9 @@ jobs:
       - name: Make zip file
         run: |
           mkdir deploy
+          cp ./appspec.yml ./deploy/
+          cp ./Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
           cp ./build/libs/*.jar ./deploy/
           zip -r -qq -j ./reddit.zip ./deploy
 
@@ -77,11 +80,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.REGISTRY }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/reddit-api-spring-boot-docker:latest
+
       - name: Upload to S3
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
             ./reddit.zip s3://reddit-s3
+
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name spring-deploy
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name spring-deploy-group
+          --s3-location bucket=reddit-s3,bundleType=zip,key=reddit.zip
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
