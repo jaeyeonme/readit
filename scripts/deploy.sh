@@ -17,6 +17,7 @@ if [ -z "$EXIST_BLUE" ]; then
     sleep 30
 
     sudo docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml down
+    sudo docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml rm -f # green 컨테이너 삭제
     sudo docker image prune -af # 사용하지 않는 이미지 삭제
 
 # blue가 실행중이면 green up
@@ -27,5 +28,6 @@ else
     sleep 30
 
     sudo docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml down
+    sudo docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml rm -f # blue 컨테이너 삭제
     sudo docker image prune -af
 fi
