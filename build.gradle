@@ -1,112 +1,139 @@
+//buildscript {
+//    dependencies {
+//        classpath "io.spring.gradle:dependency-management-plugin:1.1.0"
+//    }
+//}
+
 plugins {
-    id 'org.springframework.boot' version '3.0.6'
+    id 'java'
+    id 'org.springframework.boot' version '3.0.8' apply false
     id 'io.spring.dependency-management' version '1.1.0'
     id 'jacoco'
-    id 'java'
 }
 
-group = 'me.jaeyeon'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
 
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+allprojects { // 모든 프로젝트에 반영되는 부분
+    repositories {
+        mavenCentral()
     }
 }
 
-repositories {
-    mavenCentral()
-}
+def javaProjects = [ // Java 로 작성된 소스코드에 대한 공통작업 선언
+     project(":readit-api"),
+     project(":readit-domain"),
+     project(":readit-common"),
+]
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.security:spring-security-crypto:5.7.6'
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+configure(javaProjects) {
+    apply plugin: "java"
+    apply plugin: "jacoco"
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
 
-    // QueryDSL 추가
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    group = "${projectGroup}"
+    version = "${projectVersion}-${new Date().format('yyyyMMddHHmmss')}"
 
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-}
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-test {
-    useJUnitPlatform()
-    finalizedBy 'jacocoTestReport'
-}
-
-
-jacoco {
-    toolVersion = '0.8.8'
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-}
-
-test {
-    finalizedBy jacocoTestReport // 테스트 종료후 항상 리포트 생성
-}
-
-jacocoTestReport {
-    dependsOn test // 리포트 생성을 위해서는 test가 먼저 완료되어야 함
-}
-
-jacocoTestReport {
-    reports {
-        xml.required = true
-        csv.required = true
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
-    }
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it,
-                    include: ["me/jaeyeon/blog/controller/**/*.class",
-                              "me/jaeyeon/blog/service/**/*.class"])
-        }))
-    }
-    finalizedBy 'jacocoTestCoverageVerification'
-}
-
-jacocoTestCoverageVerification {
-    def Qdomains = []
-    // 패키지 + 클래스명
-    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
-        Qdomains.add(qPattern + '*')
+    dependencies {
+        compileOnly("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it,
-                    include: ["me/jaeyeon/blog/controller/**/*.class",
-                              "me/jaeyeon/blog/service/impl/**/*.class"])
-        }))
+    jacoco {
+        toolVersion = "0.8.8"
     }
 
-    violationRules {
-        rule {
+    test {
+        reports {
+            junitXml.required = true
+            html.required = true
+        }
+        jacoco {
             enabled = true
-            element = 'CLASS'
+            destinationFile = file("${buildDir}/jacoco/jacoco.exec")
+        }
+        finalizedBy jacocoTestReport
 
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.5
-            }
-
-            excludes = [] + Qdomains // 제외할 Qdomains 패턴 추가
+        useJUnitPlatform { //jUnit5 수행
+            excludeTags("integrationTest")
         }
     }
+
+    /**
+     * @see <a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html">Build Script Basics</a>
+     */
+    tasks.register("integrationTest", Test) {
+        useJUnitPlatform {
+            includeTags("integration")
+        }
+        finalizedBy "jacocoTestReport"
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required = true
+            html.setDestination(file("${buildDir}/reports/jacoco/html"))
+        }
+        getExecutionData().setFrom(files("${buildDir}/jacoco/jacoco.exec"))
+    }
 }
+
+def querydslProjects = [
+        project(":readit-domain"),
+        project(":readit-api")
+]
+configure(querydslProjects) {
+    dependencies {
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+        implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+        annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+        annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+        annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    }
+}
+
+
+//subprojects {
+//    compileJava {
+//        sourceCompatibility = 17
+//        targetCompatibility = 17
+//    }
+//    apply plugin: 'java'
+//    apply plugin: 'java-library'
+//    apply plugin: 'org.springframework.boot'
+//    apply plugin: 'io.spring.dependency-management'
+//
+//    repositories {
+//        mavenCentral()
+//    }
+//
+//    dependencies {
+//        compileOnly 'org.projectlombok:lombok'
+//        annotationProcessor 'org.projectlombok:lombok'
+//        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+//        testImplementation 'com.tngtech.archunit:archunit:1.0.1'
+//        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//        implementation 'org.jetbrains:annotations:23.0.0'
+//    }
+//
+//    tasks.named('test') {
+//        useJUnitPlatform()
+//    }
+//
+//}
+//
+//bootRun {
+//    enabled = false
+//}
+//
+//bootJar {
+//    enabled = false
+//}
+//
+//bootBuildImage{
+//    enabled = false
+//}

@@ -1,0 +1,13 @@
+description("readit-domain")
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    implementation project(':readit-common')
+    implementation 'org.springframework.security:spring-security-crypto:5.7.6'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'com.h2database:h2' // 테스트를 위한 인메모리 데이터베이스
+    runtimeOnly 'com.mysql:mysql-connector-j' // 실제 사용할 데이터베이스 드라이버
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
