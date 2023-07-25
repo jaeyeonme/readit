@@ -3,6 +3,7 @@ package me.jaeyeon.readitdomain.comment.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.common.exception.BlogApiException;
@@ -16,6 +17,7 @@ import me.jaeyeon.readitdomain.post.domain.Post;
 import me.jaeyeon.readitdomain.post.service.PostUseCase;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentUseCase {
 
