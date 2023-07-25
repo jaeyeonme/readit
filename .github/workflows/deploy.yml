@@ -19,6 +19,24 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Checkstyle
+        uses: dbelyaev/action-checkstyle@v0.7.5
+        with:
+          checkstyle_config: ${{ github.workspace }}/config/checkstyle/naver-checkstyle-rules.xml
+          github_token: ${{ secrets.github_token }}
+          reporter: github-check
+          level: warning
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Set yaml file
         uses: microsoft/variable-substitution@v1
         with:
@@ -33,3 +51,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean :readit-api:buildNeeded --stacktrace --info -x test
         shell: bash
+
+      - name: Add coverage to PR
+        uses: madrapps/jacoco-report@v1.3
+        with:
+          paths: ${{ github.workspace }}/build/customJacocoReportDir/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
