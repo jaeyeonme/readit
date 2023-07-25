@@ -1,4 +1,4 @@
-name: CI-CD
+name: CI/CD with Spring Boot
 
 on:
   pull_request:
@@ -41,10 +41,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set yaml file
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: './readit-api/src/main/resources/application.yml'
+      - name: Make application.yml
+        run: |
+          cd ./readit-api/src/main
+          mkdir -p resources
+          cd ./resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+        shell: bash
+
         env:
           override.value: ${{ secrets.APPLICATION }}
 
