@@ -51,7 +51,7 @@ jobs:
 
       - name: Make application.yml
         run: |
-          cd ./src/main
+          cd ./readitapi/src/main
           mkdir -p resources
           cd ./resources
           touch ./application.yml
