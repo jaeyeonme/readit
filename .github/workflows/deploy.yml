@@ -1,4 +1,4 @@
-name: CI with Spring Boot
+name: CI/CD with Spring Boot
 
 on:
   pull_request:
@@ -16,6 +16,14 @@ jobs:
     steps:
       - name: Setting Checkout
         uses: actions/checkout@v2
+
+      - name: Debug current directory
+        run: ls -la
+
+      - name: Debug directory structure
+        run: |
+          cd readitapi
+          ls -la
 
       - name: Checkstyle
         uses: dbelyaev/action-checkstyle@v0.7.5
