@@ -50,9 +50,6 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./application.yml
         shell: bash
 
-        env:
-          override.value: ${{ secrets.APPLICATION }}
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
@@ -61,17 +58,14 @@ jobs:
         run: ./gradlew clean :readit-api:buildNeeded jacocoTestReport --stacktrace --info
         shell: bash
 
-      - name: Add coverage to PR for readit-api
-        uses: madrapps/jacoco-report@v1.3
+      - name: Add coverage to PR
+        uses: madrapps/jacoco-report@v1.5
         with:
-          paths: ${{ github.workspace }}/readit-api/build/customJacocoReportDir/test/jacocoTestReport.xml
+          paths: ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Add coverage to PR for readit-domain
-        uses: madrapps/jacoco-report@v1.3
-        with:
-          paths: ${{ github.workspace }}/readit-domain/build/customJacocoReportDir/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-
-
+          min-coverage-overall: 40
+          min-coverage-changed-files: 80
+          update-comment: true
+          title: Code Coverage
+          pass-emoji: ':green_circle:'
+          fail-emoji: ':red_circle:'
