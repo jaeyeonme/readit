@@ -58,7 +58,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew clean :readit-api:buildNeeded --stacktrace --info -x test
+        run: ./gradlew clean :readit-api:buildNeeded --stacktrace --info
         shell: bash
 
       - name: Add coverage to PR

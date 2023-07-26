@@ -69,7 +69,7 @@ configure(javaProjects) {
     jacocoTestReport {
         reports {
             xml.required = true
-            xml.destination file("${project.buildDir}/customJacocoReportDir/test/jacocoTestReport.xml") // 위치 지정
+            xml.destination file("${buildDir}/customJacocoReportDir/test/jacocoTestReport.xml") // 위치 지정
             html.setDestination(file("${buildDir}/reports/jacoco/html"))
         }
         getExecutionData().setFrom(files("${buildDir}/jacoco/jacoco.exec"))
