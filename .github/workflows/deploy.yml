@@ -58,7 +58,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew clean :readit-api:buildNeeded --stacktrace --info
+        run: ./gradlew clean :readit-api:buildNeeded jacocoTestReport --stacktrace --info
         shell: bash
 
       - name: Add coverage to PR for readit-api
