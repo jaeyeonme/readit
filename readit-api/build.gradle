@@ -1,5 +1,8 @@
 description("readit-api")
 
+bootJar { enabled = true }
+jar { enabled = false }
+
 dependencies {
     implementation(project(":readit-domain"))
     implementation(project(":readit-common"))
