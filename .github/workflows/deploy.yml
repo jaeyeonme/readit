@@ -61,12 +61,17 @@ jobs:
         run: ./gradlew clean :readit-api:buildNeeded --stacktrace --info
         shell: bash
 
-      - name: Add coverage to PR
+      - name: Add coverage to PR for readit-api
         uses: madrapps/jacoco-report@v1.3
         with:
-          paths: |
-            ${{ github.workspace }}/readit-api/build/customJacocoReportDir/test/jacocoTestReport.xml
-            ${{ github.workspace }}/readit-domain/build/customJacocoReportDir/test/jacocoTestReport.xml
+          paths: ${{ github.workspace }}/readit-api/build/customJacocoReportDir/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add coverage to PR for readit-domain
+        uses: madrapps/jacoco-report@v1.3
+        with:
+          paths: ${{ github.workspace }}/readit-domain/build/customJacocoReportDir/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
 
 
