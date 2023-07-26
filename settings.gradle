@@ -1,1 +1,5 @@
-rootProject.name = 'blog'
+rootProject.name = 'readit'
+
+include 'readit-api'
+include 'readit-domain'
+include 'readit-common'

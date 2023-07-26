@@ -1,0 +1,13 @@
+description("readit-api")
+
+bootJar { enabled = true }
+jar { enabled = false }
+
+dependencies {
+    implementation(project(":readit-domain"))
+    implementation(project(":readit-common"))
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-crypto:5.7.6'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+}

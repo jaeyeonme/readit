@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    include:
+      - domain
+  jpa:
+    open-in-view: false
