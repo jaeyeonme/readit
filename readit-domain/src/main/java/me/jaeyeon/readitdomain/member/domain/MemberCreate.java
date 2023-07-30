@@ -5,26 +5,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Size;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class MemberCreate {
+public record MemberCreate(
+		@NotBlank(message = "유저 이름 입력은 필수입니다.")
+		@Size(max = 10, message = "최대 길이를 초과했습니다.")
+		String userName,
 
-	@NotBlank(message = "유저 이름 입력은 필수입니다.")
-	private String userName;
+		@NotBlank(message = "이메일 입력은 필수입니다.")
+		@Email(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "올바른 이메일 형식으로 입력해주세요.")
+		String email,
 
-	@NotBlank(message = "이메일 입력은 필수입니다.")
-	@Email(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "올바른 이메일 형식으로 입력해주세요.")
-	private String email;
-
-	@NotBlank(message = "비밀번호확인 입력은 필수입니다.")
-	@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{5,}$",
-			message = "비밀번호는 최소5자 이상, 문자1개, 숫자1개, 대문자 포함해서 특수문자 1개 포함입니다.)")
-	private String password;
+		@NotBlank(message = "비밀번호확인 입력은 필수입니다.")
+		@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{5,}$", message = "비밀번호는 최소5자 이상, 문자1개, 숫자1개, 대문자 포함해서 특수문자 1개 포함입니다.)")
+		String password
+) {
 
 	public Member toEntity(PasswordEncoder passwordEncoder) {
 		return Member.builder()

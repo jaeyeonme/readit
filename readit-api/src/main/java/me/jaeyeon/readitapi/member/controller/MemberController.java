@@ -13,25 +13,27 @@ import me.jaeyeon.readitdomain.member.domain.LoginRequest;
 import me.jaeyeon.readitdomain.member.domain.Member;
 import me.jaeyeon.readitdomain.member.domain.MemberCreate;
 import me.jaeyeon.readitdomain.member.service.AuthenticationUseCase;
-import me.jaeyeon.readitdomain.member.service.MemberUseCase;
+import me.jaeyeon.readitdomain.member.service.MemberReadUseCase;
+import me.jaeyeon.readitdomain.member.service.MemberWriteUseCase;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
 public class MemberController {
 
-	private final MemberUseCase memberUseCase;
+	private final MemberReadUseCase memberReadUseCase;
+	private final MemberWriteUseCase memberWriteUseCase;
 	private final AuthenticationUseCase authenticationUseCase;
 
 	@PostMapping("/register")
 	public ResponseEntity<Void> register(@RequestBody @Valid MemberCreate request) {
-		memberUseCase.register(request);
+		memberWriteUseCase.register(request);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<Void> signIn(@RequestBody @Valid LoginRequest signIn) {
-		Member member = memberUseCase.findByEmail(signIn.getEmail());
+		Member member = memberReadUseCase.findByEmail(signIn.getEmail());
 		authenticationUseCase.login(member.getId());
 
 		return ResponseEntity.ok().build();

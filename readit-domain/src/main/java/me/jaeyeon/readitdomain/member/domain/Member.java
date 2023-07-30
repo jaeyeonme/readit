@@ -21,6 +21,15 @@ public class Member {
 		this.password = password;
 	}
 
+	public Member updateUserName(String userName) {
+		return Member.builder()
+				.id(this.id)
+				.userName(userName)
+				.email(this.email)
+				.password(this.password)
+				.build();
+	}
+
 	public MemberEntity toEntity() {
 		return MemberEntity.builder()
 				.userName(userName)

@@ -1,10 +1,15 @@
 package me.jaeyeon.readitdomain.member.infrastructure;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -34,6 +39,9 @@ public class MemberEntity extends BaseTimeEntity {
 
 	@Column(name = "password", nullable = false)
 	private String password;
+
+	@OneToMany(mappedBy = "memberEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MemberNicknameHistoryEntity> nicknameHistories = new ArrayList<>();
 
 	@Builder
 	public MemberEntity(String userName, String email, String password) {
