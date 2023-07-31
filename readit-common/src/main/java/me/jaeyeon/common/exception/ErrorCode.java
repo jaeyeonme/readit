@@ -16,6 +16,9 @@ public enum ErrorCode {
 	IS_NOT_OWNER(HttpStatus.UNAUTHORIZED, "M-006", "작성자만 가능한 요청입니다."),
 	UNAUTHENTICATED_ACCESS(HttpStatus.UNAUTHORIZED, "M-007", "인증되지 않은 사용자 입니다."),
 
+	/** Follow */
+	FOLLOW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "F-001", "이미 팔로우한 회원입니다."),
+
 	/** POST */
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P-001", "게시글을 찾을 수 없습니다."),
 

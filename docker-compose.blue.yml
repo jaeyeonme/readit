@@ -1,8 +1,0 @@
-#green
-version: '3'
-services:
-  readit:
-    image: ghcr.io/jaeyeonme/readit:latest
-    ports:
-      - "8081:8080"
-    container_name: spring-blue
