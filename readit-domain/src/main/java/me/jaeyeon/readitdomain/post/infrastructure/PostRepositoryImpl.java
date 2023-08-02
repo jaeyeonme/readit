@@ -2,6 +2,7 @@ package me.jaeyeon.readitdomain.post.infrastructure;
 
 import static me.jaeyeon.readitdomain.post.infrastructure.QPostEntity.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,15 +16,21 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import me.jaeyeon.common.exception.BlogApiException;
+import me.jaeyeon.common.exception.ErrorCode;
+import me.jaeyeon.readitdomain.member.infrastructure.MemberEntity;
+import me.jaeyeon.readitdomain.member.infrastructure.MemberJpaRepository;
+import me.jaeyeon.readitdomain.post.domain.DailyPostCountRequest;
 import me.jaeyeon.readitdomain.post.domain.Post;
 import me.jaeyeon.readitdomain.post.service.port.PostRepository;
 
 @Repository
 @RequiredArgsConstructor
-public class PostRepositoryImpl implements PostRepository, PostRepositoryCustom {
+public class PostRepositoryImpl implements PostRepository {
 
 	private final PostJpaRepository postJpaRepository;
 	private final JPAQueryFactory queryFactory;
+	private final MemberJpaRepository memberJpaRepository;
 
 	@Override
 	public Optional<Post> findById(Long id) {
@@ -43,6 +50,24 @@ public class PostRepositoryImpl implements PostRepository, PostRepositoryCustom 
 	@Override
 	public void delete(Post post) {
 		postJpaRepository.delete(post.toEntity());
+	}
+
+	@Override
+	public Page<Post> findAllByAuthorId(Long memberId, Pageable pageable) {
+		MemberEntity memberEntity = memberJpaRepository.findById(memberId)
+				.orElseThrow(() -> new BlogApiException(ErrorCode.MEMBER_NOT_FOUND));
+		Page<PostEntity> postEntitiesPage = postJpaRepository.findAllByAuthor(memberEntity, pageable);
+		List<Post> posts = postEntitiesPage.stream()
+				.map(PostEntity::toModel)
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(posts, pageable, postEntitiesPage.getTotalElements());
+	}
+
+	@Override
+	public List<PostCountPerDate> countPostsByMemberAndDateRange(Long memberId, LocalDate startDate,
+			LocalDate endDate) {
+		return postJpaRepository.countPostsByMemberAndDateRange(memberId, startDate, endDate);
 	}
 
 	@Override
