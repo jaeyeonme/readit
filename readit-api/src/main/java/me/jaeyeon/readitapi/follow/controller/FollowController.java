@@ -24,9 +24,9 @@ public class FollowController {
 	private final FollowReadUseCase followReadUseCase;
 	private final FollowWriteUseCase followWriteUseCase;
 
-	@PostMapping("/{fromId}/{toId}")
-	public ResponseEntity<Void> followMember(@PathVariable Long fromId, @PathVariable Long toId) {
-		followWriteUseCase.follow(fromId, toId);
+	@PostMapping("/{fromMemberId}/{toMemberId}")
+	public ResponseEntity<Void> followMember(@PathVariable Long fromMemberId, @PathVariable Long toMemberId) {
+		followWriteUseCase.follow(fromMemberId, toMemberId);
 		return ResponseEntity.ok().build();
 	}
 
