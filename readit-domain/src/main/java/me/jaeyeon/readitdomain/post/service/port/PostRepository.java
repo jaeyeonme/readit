@@ -20,4 +20,5 @@ public interface PostRepository {
 	Page<Post> findByTitleContainingOrContentContaining(String keyword, Pageable pageable);
 	Page<Post> findAllByAuthorId(Long memberId, Pageable pageable);
 	List<PostCountPerDate> countPostsByMemberAndDateRange(Long memberId, LocalDate startDate, LocalDate endDate);
+	List<Post> findPostsByAuthorIdAndCursor(Long authorId, Long cursor, Pageable pageable);
 }

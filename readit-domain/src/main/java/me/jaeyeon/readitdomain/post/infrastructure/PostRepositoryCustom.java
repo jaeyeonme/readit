@@ -13,4 +13,5 @@ public interface PostRepositoryCustom {
 
 	Page<Post> findByTitleContainingOrContentContaining(String keyword, Pageable page);
 	List<Post> groupByCreatedDate(DailyPostCountRequest request);
+	List<Post> findPostsByAuthorIdAndCursor(Long authorId, Long cursor, Pageable pageable);
 }

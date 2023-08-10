@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,16 +25,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.jaeyeon.common.annotation.AuthenticationRequired;
 import me.jaeyeon.common.annotation.CurrentMember;
+import me.jaeyeon.common.utils.CursorRequest;
+import me.jaeyeon.common.utils.PageCursor;
 import me.jaeyeon.readitapi.post.controller.response.DailyPostCount;
 import me.jaeyeon.readitapi.post.controller.response.PostResponse;
+import me.jaeyeon.readitapi.post.controller.response.PostSummaryResponse;
 import me.jaeyeon.readitdomain.member.domain.Member;
-import me.jaeyeon.readitdomain.post.domain.DailyPostCountRequest;
 import me.jaeyeon.readitdomain.post.domain.Post;
 import me.jaeyeon.readitdomain.post.domain.PostCreate;
 import me.jaeyeon.readitdomain.post.domain.PostUpdate;
 import me.jaeyeon.readitdomain.post.infrastructure.PostCountPerDate;
 import me.jaeyeon.readitdomain.post.service.PostReadUseCase;
-import me.jaeyeon.readitdomain.post.service.PostUseCase;
 import me.jaeyeon.readitdomain.post.service.PostWriteUseCase;
 
 @RestController
@@ -103,5 +103,20 @@ public class PostController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(dailyPostCounts);
+	}
+
+	@GetMapping("/members/{memberId}/by-cursor")
+	public ResponseEntity<PageCursor<PostSummaryResponse>> getPostByCursor(
+			@PathVariable Long memberId,
+			CursorRequest cursorRequest) {
+
+		PageCursor<Post> postPage = postReadUseCase.getPostsByAuthorIdAndCursor(memberId,
+				cursorRequest);
+
+		List<PostSummaryResponse> postResponses = postPage.body().stream()
+				.map(PostSummaryResponse::from)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(new PageCursor<>(postPage.nextCursorRequest(), postResponses));
 	}
 }

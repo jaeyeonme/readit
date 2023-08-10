@@ -11,9 +11,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -26,6 +28,10 @@ import me.jaeyeon.readitdomain.member.infrastructure.MemberEntity;
 import me.jaeyeon.readitdomain.post.domain.Post;
 
 @Entity
+@Table(name = "post", indexes = {
+		@Index(name = "index_post_author_id", columnList = "author_id"),
+		@Index(name = "index_post_created_date", columnList = "created_date")
+})
 @Getter
 @ToString(exclude = {"comments"}, callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
