@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import me.jaeyeon.common.utils.CursorRequest;
+import me.jaeyeon.common.utils.PageCursor;
 import me.jaeyeon.readitdomain.post.domain.Post;
 import me.jaeyeon.readitdomain.post.infrastructure.PostCountPerDate;
 
@@ -14,4 +16,5 @@ public interface PostReadUseCase {
 	Post getPostById(Long id);
 	Page<Post> getPostsByAuthorId(Long memberId, Pageable pageable);
 	List<PostCountPerDate> countPostsByMemberAndDateRange(Long memberId, LocalDate startDate, LocalDate endDate);
+	PageCursor<Post> getPostsByAuthorIdAndCursor(Long memberId, CursorRequest cursorRequest);
 }

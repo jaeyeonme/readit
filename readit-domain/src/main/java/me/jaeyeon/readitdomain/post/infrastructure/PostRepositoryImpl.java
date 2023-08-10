@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -71,6 +73,20 @@ public class PostRepositoryImpl implements PostRepository {
 	}
 
 	@Override
+	public List<Post> findPostsByAuthorIdAndCursor(Long authorId, Long cursor, Pageable pageable) {
+		List<PostEntity> postEntities = queryFactory.selectFrom(postEntity)
+				.where(postEntity.author.id.eq(authorId),
+						cursorCondition(cursor))
+				.orderBy(postEntity.id.desc())
+				.limit(pageable.getPageSize())
+				.fetch();
+
+		return postEntities.stream()
+				.map(PostEntity::toModel)
+				.collect(Collectors.toList());
+	}
+
+	@Override
 	public Page<Post> findByTitleContainingOrContentContaining(String keyword, Pageable pageable) {
 		List<PostEntity> postEntities = queryFactory.selectFrom(postEntity)
 				.where(titleContains(keyword).or(contentContains(keyword)))
@@ -87,6 +103,10 @@ public class PostRepositoryImpl implements PostRepository {
 				.collect(Collectors.toList());
 
 		return new PageImpl<>(posts, pageable, total);
+	}
+
+	private BooleanExpression cursorCondition(Long cursor) {
+		return cursor == null ? null : postEntity.id.lt(cursor);
 	}
 
 	private BooleanExpression titleContains(String keyword) {

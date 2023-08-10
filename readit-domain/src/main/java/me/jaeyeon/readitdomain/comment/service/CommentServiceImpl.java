@@ -14,7 +14,7 @@ import me.jaeyeon.readitdomain.comment.service.port.CommentRepository;
 import me.jaeyeon.readitdomain.member.domain.Member;
 import me.jaeyeon.readitdomain.member.service.AuthenticationUseCase;
 import me.jaeyeon.readitdomain.post.domain.Post;
-import me.jaeyeon.readitdomain.post.service.PostUseCase;
+import me.jaeyeon.readitdomain.post.service.PostReadServiceImpl;
 
 @Service
 @Transactional
@@ -22,12 +22,12 @@ import me.jaeyeon.readitdomain.post.service.PostUseCase;
 public class CommentServiceImpl implements CommentUseCase {
 
 	private final CommentRepository commentRepository;
-	private final PostUseCase postUseCase;
+	private final PostReadServiceImpl postReadService;
 	private final AuthenticationUseCase authenticationUseCase;
 
 	@Override
 	public Comment createComment(CommentCreate commentCreate, Long postId, Member member) {
-		Post post = postUseCase.getPostById(postId);
+		Post post = postReadService.getPostById(postId);
 		Comment comment = commentCreate.toEntity(member, post);
 		commentRepository.save(comment);
 		return comment;
@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentUseCase {
 	@Override
 	public Comment replyToComment(CommentCreate commentCreate, Long postId, Long parentCommentId, Member member) {
 		Comment parentComment = getCommentById(parentCommentId);
-		Post post = postUseCase.getPostById(postId);
+		Post post = postReadService.getPostById(postId);
 		Comment childComment = commentCreate.toEntity(member, post, parentComment);
 		return commentRepository.save(childComment);
 	}
